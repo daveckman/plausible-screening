@@ -25,8 +25,8 @@ n_vec = 5*ones(k, 1); % col vector
 % MORE SETUP
 alpha = 0.05; % Confidence level = 1-alpha
 discrep_string = 'ellinf'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
-fn_props = 'lipschitz'; % {'convex', 'lipschitz'}
-prop_params = 5; % c for Lipschitz constant
+fn_props = 'convex'; % {'convex', 'lipschitz'}
+prop_params = 5; % gamma for Lipschitz constant
 
 %%
 % CHECK FOR EXCEPTIONS
@@ -59,7 +59,7 @@ fprintf('Generating sample data in parallel...\n')
 %%
 % SCREENING
 fprintf('Screening solutions in parallel...\n')
-S_indicators = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params);
+[S_indicators, D_x0s] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params);
 S = feas_region(S_indicators==1, :);
 
 %%

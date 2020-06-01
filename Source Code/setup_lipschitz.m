@@ -1,14 +1,15 @@
-function [A, C, b] = setup_opt_lipschitz(x0, exp_set, prop_params)
+function [A, C, b] = setup_lipschitz(x0, exp_set, prop_params)
 
-% Setup optimization problem for Lipschitz performance function
-% M(x_0) = proj_m(P) where P = {(m,w): A*m + C*w <= b}
+% Formulate M(x0) for Lipschitz performance function
+% M(x0) = proj_m(P) where P = {(m,w): A*m + C*w <= b}
 % Construct A, C, and b.
 
 % Lipschitz case
 % m = (m_1, ... m_k)
 % w = m_0
 
-% m_i - m_j <= gamma*||x_i - x_j|| for all i, j = 1, ..., k with i neq j
+% M(x0) is described by the linear inequalities
+% m_i - m_j <= gamma*||x_i - x_j|| for all i, j = 1, ..., k with i ~= j
 % m_i - m_0 <= gamma*||x_i - x_0|| for all i = 1, ..., k
 % -m_i + m_0 <= 0 for all i = 1, ..., k
 
@@ -26,7 +27,7 @@ b = zeros(num_constraints, 1);
 %%% LOOK INTO FASTER SPARSE CONSTRUCTION
 
 % First set of constraints: 
-% m_i - m_j <= gamma*||x_i - x_j|| for all i, j = 1, ..., k with i neq j
+% m_i - m_j <= gamma*||x_i - x_j|| for all i, j = 1, ..., k with i ~= j
 
 for i = 1:k
     for j = 1:k

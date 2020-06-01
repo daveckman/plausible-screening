@@ -1,4 +1,4 @@
-function S_indicators = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params)
+function [S_indicators, D_x0s] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params)
 
 % Carry out plausible optima screening w.r.t. optimality.
 % Use given functional properties and specified discrepancy/confidence.
@@ -8,17 +8,15 @@ function S_indicators = PO_screen(feas_region, exp_set, sample_mean, sample_var,
 k = size(exp_set,1);
 D_cutoff = calc_cutoff(k, n_vec, alpha, discrep_string);
 
-PO_info_handle = str2func(strcat('setup_opt_',fn_props));
+PO_info_handle = str2func(strcat('setup_',fn_props));
 
 card_feas_region = size(feas_region, 1);
 S_indicators = zeros(card_feas_region, 1);
+D_x0s = zeros(card_feas_region, 1);
 
 parfor_progress(card_feas_region);
 parfor l = 1:card_feas_region
-    
-%     if mod(l, 10) == 0
-%         fprintf('Evaluating solution %d of %d.\n', l, card_feas_region);
-%     end
+%for l = 1:card_feas_region
     
     x0 = feas_region(l,:);
     
@@ -26,10 +24,10 @@ parfor l = 1:card_feas_region
     [A, C, b] = PO_info_handle(x0, exp_set, prop_params);
     
     % Calculate minimum standardized discrepancy of solution x0
-    D_x0 = calc_min_std_discrep(discrep_string, A, C, b, sample_mean, sample_var, n_vec);
+    D_x0s(l) = calc_min_std_discrep(discrep_string, A, C, b, sample_mean, sample_var, n_vec);
    
     % Classify solution x0
-    S_indicators(l) = (D_x0 <= D_cutoff);
+    S_indicators(l) = (D_x0s(l) <= D_cutoff);
     
     parfor_progress;
     
