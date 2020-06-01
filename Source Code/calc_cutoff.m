@@ -27,7 +27,7 @@ switch discrep_string
         D_cutoff = quantile(max(abs(terms), [], 1), 1-alpha);
         
     case 'CRN'
-        D_cutoff = finv(1-alpha, k, n_vec(1)-k);
+        D_cutoff = k*(n_vec(1) - 1)/(n_vec(1) - k) * finv(1-alpha, k, n_vec(1)-k);
         
     otherwise
         fprintf('Specify a valid discrepancy: {ell1, ell2, ellinf, CRN}.\n')
