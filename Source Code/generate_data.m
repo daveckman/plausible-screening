@@ -1,4 +1,4 @@
-function [sample_mean, sample_var] = generate_data(oracle_string, oracle_n_rngs, exp_set, n_vec, crn_flag)
+function [sample_mean, sample_var] = generate_data(oracle_string, oracle_n_rngs, exp_set, n_vec, discrep_string)
 % Generate data from solutions in the experiment set.
 % Take n_i replications at solution x_i for i = 1, ... k where k is the
 % cardinality of the experimental set X.
@@ -8,7 +8,8 @@ oracle_handle = str2func(oracle_string);
 % Each row of exp_set corresponds to a solution 
 k = size(exp_set, 1); % Number of evaluated solutions
 
-if crn_flag == 1 % CRN
+if strcmp(discrep_string, 'CRN') == 1
+    % Use CRN if CRN discrepancy is specified
 
     % Check that all values in n_vec vector are equal
     if min(n_vec) ~= max(n_vec)
@@ -44,7 +45,7 @@ if crn_flag == 1 % CRN
     sample_mean = mean(outputs,2);
     sample_var = cov(outputs');
     
-elseif crn_flag == 0 % No CRN
+else % otherwise do independent sampling
     
     % Initialize for storage
     sample_mean = zeros(k,1);
@@ -69,7 +70,7 @@ elseif crn_flag == 0 % No CRN
         sample_mean(i) = mean(outputs);
         sample_var(i) = var(outputs);
     end
-end
+end % end if
 
 end
 
