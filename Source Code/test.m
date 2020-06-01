@@ -24,7 +24,7 @@ n_vec = 5*ones(k, 1); % col vector
 %%
 % MORE SETUP
 alpha = 0.05; % Confidence level = 1-alpha
-discrep_string = 'ell2'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
+discrep_string = 'ell1'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
 fn_props = 'lipschitz'; % {'convex', 'lipschitz'}
 prop_params = 5; % c for Lipschitz constant
 

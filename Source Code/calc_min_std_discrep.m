@@ -36,9 +36,9 @@ switch discrep_string
         % D(x_0) = min_{(m, w) in P} sum_{i=1}^k sqrt{n_i}/\hat{\sigma}_i |muhat_i - m_i|
         
         % Formulate as linear program
-        f_LP = [sqrt(n_vec./sample_var); sqrt(n_vec./sample_var); zeros(q, 1)];
-        A_LP = [-A, A, C]; 
-        b_LP = b - A*sample_mean;
+        f_LP = [sqrt(n_vec./sample_var); sqrt(n_vec./sample_var); zeros(q,1)];
+        A_LP = [-A, A, C; -speye(k), zeros(k,k), zeros(k,q); zeros(k,k), -speye(k), zeros(k,q)];
+        b_LP = [b - A*sample_mean; zeros(k,1); zeros(k,1)];
         
         % Solve linear prgram (suppress outputs)
         options = optimoptions('linprog','Display','none');
@@ -50,8 +50,8 @@ switch discrep_string
         % D(x_0) = min_{(m, w) in P} sum_{i=1}^k n_i/\hat{\sigma}_i^2 (muhat_i - m_i)^2
         
         % Formulate as quadratic program  
-        H_QP = [2*spdiags(n_vec./sample_var,0,k,k), zeros(k, q); zeros(q, k), zeros(q, q)];
-        f_QP = [-2*n_vec./sample_var.*sample_mean; zeros(q, 1)];
+        H_QP = [2*spdiags(n_vec./sample_var,0,k,k), zeros(k,q); zeros(q,k), zeros(q,q)];
+        f_QP = [-2*n_vec./sample_var.*sample_mean; zeros(q,1)];
         A_QP = [A, C];
         b_QP = b;
         opt_val_offset = (n_vec./sample_var)'*sample_mean.^2;
@@ -68,7 +68,7 @@ switch discrep_string
         
         % Formulate as linear program
         f_LP = [zeros(k,1); zeros(q,1); 1];
-        A_LP = [A, C, zeros(p,1); -spdiags(sqrt(n_vec./sample_var),0,k,k), zeros(k,q), -ones(k,1); spdiags(sqrt(n_vec./sample_var),0,k,k), zeros(k,q), -ones(k,1)];
+        A_LP = [A, C, zeros(p, 1); -spdiags(sqrt(n_vec./sample_var),0,k,k), zeros(k,q), -ones(k,1); spdiags(sqrt(n_vec./sample_var),0,k,k), zeros(k,q), -ones(k,1)];
         b_LP = [b; -sqrt(n_vec./sample_var).*sample_mean; sqrt(n_vec./sample_var).*sample_mean];
         
         % Solve linear program (suppress outputs)
@@ -81,8 +81,8 @@ switch discrep_string
         % D(x_0) = min_{(m, w) in P} n*(muhat - m)'*Sigma^{-1}*(muhat - m)
         
         % Formulate as quadratic program
-        H_QP = [2*n_vec(1)*inv(sample_var), zeros(k, q); zeros(q, k), zeros(q, q)];
-        f_QP = [-2*n_vec(1)*(sample_mean'/sample_var)'; zeros(q, 1)];
+        H_QP = [2*n_vec(1)*inv(sample_var), zeros(k,q); zeros(q,k), zeros(q,q)];
+        f_QP = [-2*n_vec(1)*(sample_mean'/sample_var)'; zeros(q,1)];
         A_QP = [A, C];
         b_QP = b;
         opt_val_offset = n_vec(1)*sample_mean'*(sample_var\sample_mean);
