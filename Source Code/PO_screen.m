@@ -13,12 +13,12 @@ PO_info_handle = str2func(strcat('setup_opt_',fn_props));
 card_feas_region = size(feas_region, 1);
 S_indicators = zeros(card_feas_region, 1);
 
-% eventually make this a parfor
-for l = 1:card_feas_region
+parfor_progress(card_feas_region);
+parfor l = 1:card_feas_region
     
-    if mod(l, 10) == 0
-        fprintf('Evaluating solution %d of %d', l, card_feas_region);
-    end
+%     if mod(l, 10) == 0
+%         fprintf('Evaluating solution %d of %d.\n', l, card_feas_region);
+%     end
     
     x0 = feas_region(l,:);
     
@@ -31,4 +31,7 @@ for l = 1:card_feas_region
     % Classify solution x0
     S_indicators(l) = (D_x0 <= D_cutoff);
     
-end
+    parfor_progress;
+    
+end % end parfor
+parfor_progress(0);

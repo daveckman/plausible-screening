@@ -26,6 +26,7 @@ if strcmp(discrep_string, 'CRN') == 1
         oracle_rngs{r} = RandStream.create('mrg32k3a', 'NumStreams', oracle_n_rngs, 'StreamIndices', r);
     end
     
+    parfor_progress(k);
     for i = 1:k  
         % Extract solution x_i and sample size n_i
         x_i = exp_set(i,:);
@@ -39,7 +40,10 @@ if strcmp(discrep_string, 'CRN') == 1
         
         % Take n_i replications at x_i
         outputs(i,:) = oracle_handle(oracle_rngs, x_i, n_i);
+        
+        parfor_progress;
     end
+    parfor_progress(0);
     
     % Calculate summary statistics
     sample_mean = mean(outputs,2);
@@ -51,6 +55,7 @@ else % otherwise do independent sampling
     sample_mean = zeros(k,1);
     sample_var = zeros(k,1);
     
+    parfor_progress(k);
     for i = 1:k
         
         % Extract solution x_i and sample size n_i
@@ -69,7 +74,12 @@ else % otherwise do independent sampling
         % Calculate summary statistics
         sample_mean(i) = mean(outputs);
         sample_var(i) = var(outputs);
+        
+        parfor_progress;
+        
     end
+    parfor_progress(0);
+    
 end % end if
 
 end
