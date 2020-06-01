@@ -24,9 +24,30 @@ n_vec = 5*ones(k, 1); % col vector
 %%
 % MORE SETUP
 alpha = 0.05; % Confidence level = 1-alpha
-discrep_string = 'CRN'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
+discrep_string = 'ell2'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
 fn_props = 'lipschitz'; % {'convex', 'lipschitz'}
 prop_params = 5; % c for Lipschitz constant
+
+%%
+% CHECK FOR EXCEPTIONS
+
+accept_discreps = {'ell1', 'ell2', 'ellinf', 'CRN'};
+if ~any(strcmp(discrep_string, accept_discreps))
+    fprintf('ERROR: "%s" is not a valid standardized discrepancy.\n', discrep_string)
+    fprintf('Please specify a valid standardized discrepancy:')
+    fprintf('\t%s', accept_discreps{:})
+    fprintf('.\n')
+    return
+end
+
+accept_fn_props = {'lipschitz', 'convex'};
+if ~any(strcmp(fn_props, accept_fn_props))
+    fprintf('ERROR: "%s" is not a valid functional property.\n', fn_props)
+    fprintf('Please specify a valid functional property:')
+    fprintf('\t%s', accept_fn_props{:})
+    fprintf('.\n')
+    return
+end
 
 %%
 % SAMPLING
@@ -39,10 +60,15 @@ prop_params = 5; % c for Lipschitz constant
 S_indicators = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params);
 S = feas_region(S_indicators==1, :);
 
-%disp(S)
+%%
+% PRINT TO SCREEN
 
-%S_poly_indicators = PO_screen_relax(feas_region, exp_set, sample_mean, sample_var, alpha, discrep_string, fn_props, prop_params);
-%S_poly = feas_region(S_poly_indicators,:);
+fprintf('Results of PO screening\n----------------------------------------------------\n')
+fprintf('\tproblem name: \t\t\t\t\t\t%s\n', oracle_string)
+fprintf('\tstandardized discrepancy: \t\t\t%s\n', discrep_string)
+fprintf('\tfunctional property: \t\t\t\t%s\n', fn_props)
+fprintf('\t# of solutions in feasible region: \t%d\n', size(feas_region,1))
+fprintf('\t# of solutions in PO subset: \t\t%d\n', sum(S_indicators))
 
 %%
 % PLOTTING

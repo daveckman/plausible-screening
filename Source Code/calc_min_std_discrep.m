@@ -40,9 +40,10 @@ switch discrep_string
         A_LP = [-A, A, C]; 
         b_LP = b - A*sample_mean;
         
-        % Solve linear prgram
-        [~, D_x0] = linprog(f_LP, A_LP, b_LP);
-
+        % Solve linear prgram (suppress outputs)
+        options = optimoptions('linprog','Display','none');
+        [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], [], [], [], options);
+        
     case 'ell2' % D_2 standardized discrepancy
         
         % Optimization problem
@@ -55,8 +56,9 @@ switch discrep_string
         b_QP = b;
         opt_val_offset = (n_vec./sample_var)'*sample_mean.^2;
         
-        % Solve quadratic program
-        [~, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP);
+        % Solve quadratic program (suppress outputs)
+        options = optimoptions('quadprog','Display','none');
+        [~, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP, [], [], [], [], [], options);
         D_x0 = f_val + opt_val_offset;
         
     case 'ellinf' % D_inf standardized discrepancy
@@ -69,8 +71,9 @@ switch discrep_string
         A_LP = [A, C, zeros(p,1); -spdiags(sqrt(n_vec./sample_var),0,k,k), zeros(k,q), -ones(k,1); spdiags(sqrt(n_vec./sample_var),0,k,k), zeros(k,q), -ones(k,1)];
         b_LP = [b; -sqrt(n_vec./sample_var).*sample_mean; sqrt(n_vec./sample_var).*sample_mean];
         
-        % Solve linear program
-        [~, D_x0] = linprog(f_LP, A_LP, b_LP);
+        % Solve linear program (suppress outputs)
+        options = optimoptions('linprog','Display','none');
+        [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], [], [], [], options);
 
     case 'CRN' % D_crn standardized discrepancy
             
@@ -84,12 +87,10 @@ switch discrep_string
         b_QP = b;
         opt_val_offset = n_vec(1)*sample_mean'*(sample_var\sample_mean);
         
-        % Solve quadratic program
-        [~, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP);
+        % Solve quadratic program (suppress outputs)
+        options = optimoptions('quadprog','Display','none');
+        [~, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP, [], [], [], [], [], options);
         D_x0 = f_val + opt_val_offset;
-        
-    otherwise
-        fprintf('Specify a valid discrepancy: {ell1, ell2, ellinf, CRN}.\n')
             
 end % end switch
 
