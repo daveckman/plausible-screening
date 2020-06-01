@@ -39,7 +39,8 @@ prop_params = 5; % c for Lipschitz constant
 %%
 % SCREENING
 S_indicators = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, crn_flag);
-S = feas_region([1:size(feas_region,1)]'.*S_indicators,:);
+S = feas_region(S_indicators==1, :);
+
 
 %disp(S)
 
