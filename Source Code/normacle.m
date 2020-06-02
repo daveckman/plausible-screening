@@ -21,7 +21,7 @@ for j = 1:n_reps
     
     % Generate noise
     RandStream.setGlobalStream(noise_stream)
-    noise = normrnd(0, norm(solution, 2));
+    noise = normrnd(0, norm(solution, 2) + 0.1);
     
     % Add noise to expected value function
     outputs(j) = norm(solution, 2) + noise;

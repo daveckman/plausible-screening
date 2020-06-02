@@ -18,8 +18,8 @@ gamma = prop_params;
 
 k = size(exp_set, 1);
 
-num_constraints = 2*k^2;
-A = spalloc(num_constraints, k, 4*k^2);
+num_constraints = k^2 + k;
+A = spalloc(num_constraints, k, 2*k^2);
 C = spalloc(num_constraints, 1, 2*k);
 b = zeros(num_constraints, 1);
 
@@ -42,9 +42,6 @@ for i = 1:k
             A(row, j) = -1;
             b(row) = gamma*norm(exp_set(i,:) - exp_set(j,:),2);
             
-            A(row + k*(k-1), i) = -1; 
-            A(row + k*(k-1), j) = 1;
-            b(row + k*(k-1)) = gamma*norm(exp_set(i,:) - exp_set(j,:),2);
         end
     end
 end
@@ -52,17 +49,17 @@ end
 % Second set of constraints
 % m_i - m_0 <= gamma*||x_i - x_0|| for all i = 1, ..., k
 
-A((2*k*(k-1) + 1 : 2*k*(k-1) + k),:) = speye(k);
-C(2*k*(k-1) + 1 : 2*k*(k-1) + k) = -ones(k,1);
+A((k*(k-1) + 1 : k*(k-1) + k),:) = speye(k);
+C(k*(k-1) + 1 : k*(k-1) + k) = -ones(k,1);
 for i = 1:k
-    b(2*k*(k-1) + i) = gamma*norm(exp_set(i,:) - x0);
+    b(k*(k-1) + i) = gamma*norm(exp_set(i,:) - x0);
 end
 
 % Third set of constraints
 % -m_i + m_0 <= 0 for all i = 1, ..., k
 
-A((2*k*(k-1) + k + 1 : end),:) = -speye(k);
-C(2*k*(k-1) + k + 1 : end) = ones(k,1);
+A((k*(k-1) + k + 1 : end),:) = -speye(k);
+C(k*(k-1) + k + 1 : end) = ones(k,1);
 
 end
 
