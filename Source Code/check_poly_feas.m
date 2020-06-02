@@ -26,27 +26,19 @@ bprime = zeros(p,1);
 switch discrep_string
     case 'ell1' % D_1 standardized discrepancy
         
-        for j = 1:p
-            bprime(j) = b(j) + D_cutoff * max(sqrt(sample_var./n_vec).*abs(A(j,:)'));
-        end
+        bprime = b + D_cutoff * max(sqrt(sample_var./n_vec)'.*abs(A), [], 2);
         
     case 'ell2' % D_2 standardized discrepancy
        
-        for j = 1:p
-            bprime(j) = b(j) + D_cutoff * sum(sample_var./n_vec.*(A(j,:).^2)'); 
-        end
+        bprime = b + D_cutoff * (A.^2)*(sample_var./n_vec); 
         
     case 'ellinf' % D_inf standardized discrepancy
 
-        for j = 1:p
-            bprime(j) = b(j) + D_cutoff * sum(sqrt(sample_var./n_vec).*abs(A(j,:)'));
-        end
+        bprime = b + D_cutoff * abs(A)*sqrt(sample_var./n_vec);
         
     case 'CRN' % D_crn standardized discrepancy
         
-        for j = 1:p
-            bprime(j) = b(j) + D_cutoff * 1/n_vec(1)*A(j,:)*sample_var*A(j,:)';
-        end
+        bprime = b + D_cutoff * 1/n_vec(1)*sum((A*sample_var).*A,2);
         
 end % end switch
 
