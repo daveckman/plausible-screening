@@ -10,12 +10,6 @@ k = size(exp_set, 1); % Number of evaluated solutions
 
 if strcmp(discrep_string, 'CRN') == 1
     % Use CRN if CRN discrepancy is specified
-
-    % Check that all values in n_vec vector are equal
-    if min(n_vec) ~= max(n_vec)
-        fprintf('All sample sizes must be equal when using CRN.\n')
-        return
-    end
     
     % Initialize for storage
     outputs = zeros(k, n_vec(1));
