@@ -8,7 +8,7 @@ function [A, C, b] = setup_lipschitz(x0, exp_set, prop_params)
 % m = (m_1, ... m_k)
 % w = m_0
 
-% M(x0) is described by the linear inequalities
+% P is described by the linear inequalities
 % m_i - m_j <= gamma*||x_i - x_j|| for all i, j = 1, ..., k with i ~= j
 % m_i - m_0 <= gamma*||x_i - x_0|| for all i = 1, ..., k
 % -m_i + m_0 <= 0 for all i = 1, ..., k

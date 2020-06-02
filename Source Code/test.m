@@ -17,15 +17,15 @@ clc;
 feas_region = fullfact([5, 5, 5, 5, 5]) - 3;
 oracle_string = 'normacle';
 oracle_n_rngs = 1;
-exp_set = unique(unidrnd(5, [20, 5]) - 3, 'rows');
+exp_set = unique(unidrnd(5, [10, 5]) - 3, 'rows');
 k = size(exp_set, 1);
-n_vec = 5*ones(k, 1); % col vector
+n_vec = 10*ones(k, 1); % col vector
 
 %%
 % MORE SETUP
 alpha = 0.05; % Confidence level = 1-alpha
 discrep_string = 'ellinf'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
-fn_props = 'convex'; % {'convex', 'lipschitz'}
+fn_props = 'lipschitz_proj'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = 5; % gamma for Lipschitz constant
 
 %%
@@ -40,7 +40,7 @@ if ~any(strcmp(discrep_string, accept_discreps))
     return
 end
 
-accept_fn_props = {'lipschitz', 'convex'};
+accept_fn_props = {'lipschitz', 'lipschitz_proj', 'convex'};
 if ~any(strcmp(fn_props, accept_fn_props))
     fprintf('\nERROR: "%s" is not a valid functional property.\n', fn_props)
     fprintf('Please specify a valid functional property:')

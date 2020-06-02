@@ -16,7 +16,6 @@ D_x0s = zeros(card_feas_region, 1);
 
 parfor_progress(card_feas_region);
 parfor l = 1:card_feas_region
-%for l = 1:card_feas_region
     
     x0 = feas_region(l,:);
     
