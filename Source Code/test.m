@@ -13,28 +13,28 @@ clc;
 % k = size(exp_set, 1);
 % n_vec = 5*ones(k, 1); % col vector
 
-% % TEST 1: Feasible region is {-2, -1, 0, 1, 2}^5
-% feas_region = fullfact([5, 5, 5, 5, 5]) - 3;
-% oracle_string = 'normacle';
-% oracle_n_rngs = 1;
-% exp_set = unique(unidrnd(5, [10, 5]) - 3, 'rows');
-% k = size(exp_set, 1);
-% n_vec = 10*ones(k, 1); % col vector
-
-% TEST 2: Feasible region is {-1, 0, 1}^3
-feas_region = fullfact([3, 3, 3]) - 2;
+% TEST 1: Feasible region is {-2, -1, 0, 1, 2}^5
+feas_region = fullfact([5, 5, 5, 5, 5]) - 3;
 oracle_string = 'normacle';
 oracle_n_rngs = 1;
-exp_set = feas_region; % enumerate
+exp_set = unique(unidrnd(5, [10, 5]) - 3, 'rows');
 k = size(exp_set, 1);
-n_vec = 15*ones(k, 1); % col vector
+n_vec = 10*ones(k, 1); % col vector
+
+% % TEST 2: Feasible region is {-1, 0, 1}^3
+% feas_region = fullfact([3, 3, 3]) - 2;
+% oracle_string = 'normacle';
+% oracle_n_rngs = 1;
+% exp_set = feas_region; % enumerate
+% k = size(exp_set, 1);
+% n_vec = 15*ones(k, 1); % col vector
 
 %%
 % MORE SETUP
 alpha = 0.05; % Confidence level = 1-alpha
 discrep_string = 'ellinf'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
-fn_props = 'convex'; % {'convex', 'lipschitz', 'lipschitz_proj}
-prop_params = 3; % gamma for Lipschitz constant
+fn_props = 'lipschitz_proj'; % {'convex', 'lipschitz', 'lipschitz_proj}
+prop_params = 5; % gamma for Lipschitz constant
 
 %%
 % CHECK FOR EXCEPTIONS
@@ -67,8 +67,9 @@ fprintf('Generating sample data in parallel...\n')
 %%
 % SCREENING
 fprintf('Screening solutions in parallel...\n')
-[S_indicators, D_x0s] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params);
+[S_indicators, D_x0s, S_poly_indicators, zs] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params);
 S = feas_region(S_indicators==1, :);
+S_poly = feas_region(S_poly_indicators==1, :);
 
 %%
 % PRINT TO SCREEN
@@ -80,6 +81,7 @@ fprintf('\tfunctional property: \t\t\t\t\t%s\n', fn_props)
 fprintf('\t# of solutions in feasible region: \t\t%d\n', size(feas_region,1))
 fprintf('\t# of solutions in experimental set: \t%d\n', size(exp_set,1))
 fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators))
+fprintf('\t# of solutions in PO relaxed subset: \t%d\n', sum(S_poly_indicators))
 
 %%
 % PLOTTING
