@@ -6,35 +6,53 @@ clc;
 % SETUP
 
 % % TEST 0: Toy problem
-% feas_region = [1; 2; 3];
 % oracle_string = 'normacle';
 % oracle_n_rngs = 1;
+% feas_region = [1; 2; 3];
 % exp_set = [1; 3];
 % k = size(exp_set, 1);
 % n_vec = 5*ones(k, 1); % col vector
 
 % % TEST 1: Feasible region is {-2, -1, 0, 1, 2}^5
-% feas_region = fullfact([5, 5, 5, 5, 5]) - 3;
 % oracle_string = 'normacle';
 % oracle_n_rngs = 1;
+% feas_region = fullfact([5, 5, 5, 5, 5]) - 3;
 % exp_set = unique(unidrnd(5, [10, 5]) - 3, 'rows');
 % k = size(exp_set, 1);
 % n_vec = 10*ones(k, 1); % col vector
 
-% TEST 2: Feasible region is {-1, 0, 1}^3
-feas_region = fullfact([3, 3, 3]) - 2;
-oracle_string = 'normacle';
+% % TEST 2: Feasible region is {-1, 0, 1}^3
+% oracle_string = 'normacle';
+% oracle_n_rngs = 1;
+% feas_region = fullfact([3, 3, 3]) - 2;
+% exp_set = feas_region; % enumerate
+% k = size(exp_set, 1);
+% n_vec = 27*ones(k, 1); % col vector
+
+% TEST 3: (s,S) inventory problem
+oracle_string = 'sS_oracle';
 oracle_n_rngs = 1;
-exp_set = feas_region; % enumerate
+[A,B] = meshgrid(10:80,10:100);
+feas_region = [A(:),B(:)];
+feas_region = feas_region(feas_region(:,1)+14.5 < feas_region(:,2),:);
+scrXn = [feas_region;...
+    repmat(feas_region(feas_region(:,1)-feas_region(:,2)==-15,:),[5,1]);
+    repmat(feas_region(feas_region(:,1)==10,:),[5,1]);
+    repmat(feas_region(feas_region(:,1)==80,:),[5,1]);
+    repmat(feas_region(feas_region(:,2)==10,:),[5,1]);
+    repmat(feas_region(feas_region(:,2)==100,:),[5,1])];
+K = 25;
+[IDX, C] = kmeans(scrXn,25);
+exp_set = round(C);
 k = size(exp_set, 1);
-n_vec = 27*ones(k, 1); % col vector
+n_vec = 10*ones(k, 1); % col vector
 
 %%
 % MORE SETUP
 alpha = 0.05; % Confidence level = 1-alpha
 discrep_string = 'ellinf'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
 fn_props = 'lipschitz_proj'; % {'convex', 'lipschitz', 'lipschitz_proj}
-prop_params = 5; % gamma for Lipschitz constant
+prop_params = 3; % gamma for Lipschitz constant
 
 %%
 % CHECK FOR EXCEPTIONS

@@ -9,14 +9,13 @@ function [outputs] = normacle(oracle_rngs, solution, n_reps)
 % Unpack random number streams
 noise_stream = oracle_rngs{1};
 
-
 % Initialize for storage
 outputs = zeros(1, n_reps);
 
 % Generate outputs
 for j = 1:n_reps
     
-    % New substream for each iteration
+    % New substream for each replication
     noise_stream.Substream = j;
     
     % Generate noise
