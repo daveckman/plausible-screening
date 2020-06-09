@@ -20,7 +20,7 @@ S_poly_indicators = zeros(card_feas_region, 1);
 D_x0s = zeros(card_feas_region, 1);
 zs = zeros(card_feas_region, 1);
 
-parfor_progress(card_feas_region);
+%parfor_progress(card_feas_region);
 parfor l = 1:card_feas_region
     
     x0 = feas_region(l,:);
@@ -40,7 +40,7 @@ parfor l = 1:card_feas_region
     % Classify solution x0 via relaxation
     S_poly_indicators(l) = (zs(l) >= 0); 
     
-    parfor_progress;
+    %parfor_progress;
     
 end % end parfor
-parfor_progress(0);
+%parfor_progress(0);

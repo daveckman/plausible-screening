@@ -59,10 +59,11 @@ end
 
 %%
 % SAMPLING
+m = 1; % 1 macroreplication
 
 % Generate data and calculate summary statistics
 fprintf('Generating sample data in parallel...\n')
-[sample_mean, sample_var] = generate_data(oracle_string, oracle_n_rngs, exp_set, n_vec, discrep_string);
+[sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, discrep_string);
 
 %%
 % SCREENING
