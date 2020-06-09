@@ -12,11 +12,13 @@ q = size(C,2); % Number of unprojected components
 
 % MATLAB's linprog() and quadprog() functions take the following arguments.
 
-% linprog(f_LP, A_LP, b_LP) solves a linear program of the form
-%   min_x f_LP'*x s.t. A_LP*x <= b_LP where
+% linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP) solves a linear program of the form
+%   min_x f_LP'*x s.t. A_LP*x <= b_LP where lb_LP <= x <= ub_LP
 %       f_LP is a column vector
 %       A_LP is a matrix
 %       b_LP is a column vector
+%       lb_LP is a row vector
+%       ub_LP is a row vector
 
 % quadprog(h_QP, f_QP, A_QP, b_QP) solves a quadratic program of the form
 %   min_x 0.5*x'*H_QP*x + f_QP'*x s.t. A_QP*x <= b_QP where
@@ -37,12 +39,15 @@ switch discrep_string
         
         % Formulate as linear program
         f_LP = [sqrt(n_vec./sample_var); sqrt(n_vec./sample_var); zeros(q,1)];
-        A_LP = [-A, A, C; -speye(k), zeros(k,k), zeros(k,q); zeros(k,k), -speye(k), zeros(k,q)];
-        b_LP = [b - A*sample_mean; zeros(k,1); zeros(k,1)];
+        A_LP = [-A, A, C];
+        b_LP = b - A*sample_mean;
+        lb_LP = [zeros(1, 2*k), -Inf*ones(1, q)];
+        ub_LP = Inf*ones(1, 2*k + q);
         
         % Solve linear prgram (suppress outputs)
         options = optimoptions('linprog','Display','none');
-        [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], [], [], [], options);
+        [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP, options);
+        
         
     case 'ell2' % D_2 standardized discrepancy
         
@@ -73,7 +78,7 @@ switch discrep_string
         
         % Solve linear program (suppress outputs)
         options = optimoptions('linprog','Display','none');
-        [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], [], [], [], options);
+        [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], [], [], options);
 
     case 'CRN' % D_crn standardized discrepancy
             
