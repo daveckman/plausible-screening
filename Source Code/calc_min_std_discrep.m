@@ -46,8 +46,11 @@ switch discrep_string
         
         % Solve linear prgram (suppress outputs)
         options = optimoptions('linprog','Display','none');
-        [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP, options);
-        
+        [~, D_x0v1] = linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP, options);
+        [~, D_x0] =  glpkcc(f_LP,A_LP, b_LP, lb_LP, ub_LP,repmat('U',size(A_LP,1),1),repmat('C',size(A_LP,2),1),1,struct('savefilename','SimpleLP'));
+        if abs(D_x0v1-D_x0) > 10^(-5)
+            disp('Error, linprog and glpkcc solvers do not agree')
+        end
         
     case 'ell2' % D_2 standardized discrepancy
         
@@ -79,7 +82,7 @@ switch discrep_string
         % Solve linear program (suppress outputs)
         options = optimoptions('linprog','Display','none');
         [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], [], [], options);
-
+        
     case 'CRN' % D_crn standardized discrepancy
             
         % Optimization problem
