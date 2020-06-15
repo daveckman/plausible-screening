@@ -1,4 +1,4 @@
-function z = check_poly_feas(discrep_string, A, C, b, sample_mean, sample_var, n_vec, D_cutoff)
+function z = check_poly_feas(discrep_string, A, C, b, sample_mean, sample_var, n_vec, D_cutoff, LP_solver_string)
 
 % 1. Take polyhedral representation of P.
 % 2. Offset the rhs vector to account for the uncertainty about the true function.
@@ -58,12 +58,23 @@ else % Formulate and solve a linear program (via Farkas' lemma)
     Aeq_LP = C';
     beq_LP = zeros(q,1);
 
-    options = optimoptions('linprog','Display','none');
-    [~, z, exit_flag] = linprog(f_LP, A_LP, b_LP, Aeq_LP, beq_LP, [], [], [], options);
-
-    % Check if linear program was unbounded.
-    if exit_flag == -3
-        z = -Inf;
+    switch LP_solver_string
+        case 'MATLAB'
+            options = optimoptions('linprog','Display','none');
+            [~, z, exit_flag] = linprog(f_LP, A_LP, b_LP, Aeq_LP, beq_LP, [], [], [], options);
+            
+            %Check if linear program was unbounded.
+            if exit_flag == -3
+                z = -Inf;
+            end
+            
+        case 'glpk'
+            [~, z, exit_flag] = glpk(f_LP, [A_LP; Aeq_LP], [b_LP; beq_LP], -Inf*ones(size(A_LP,2),1), Inf*ones(size(A_LP,2),1), [repmat('U',size(A_LP,1),1); repmat('S',size(Aeq_LP,1),1)], repmat('C',size(A_LP,2),1), 1, struct('savefilename','SimpleLP'));
+            
+            %Check if linear program was unbounded.
+            if exit_flag == 6
+                z = -Inf;
+            end
     end
     
 end

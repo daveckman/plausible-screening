@@ -35,8 +35,8 @@ parfor l = 1:card_feas_region
     S_indicators(l) = (D_x0s(l) <= D_cutoff);
     
     % Solve linear program to check feasibility
-    zs(l) = check_poly_feas(discrep_string, A, C, b, sample_mean, sample_var, n_vec, D_cutoff);
-
+    zs(l) = check_poly_feas(discrep_string, A, C, b, sample_mean, sample_var, n_vec, D_cutoff, LP_solver_string);
+    
     % Classify solution x0 via relaxation
     S_poly_indicators(l) = (zs(l) >= 0); 
     
