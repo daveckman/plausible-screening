@@ -1,4 +1,4 @@
-function D_x0 = calc_min_std_discrep(discrep_string, A, C, b, sample_mean, sample_var, n_vec)
+function D_x0 = calc_min_std_discrep(discrep_string, A, C, b, sample_mean, sample_var, n_vec, LP_solver_string)
 
 % 1. Take polyhedral representation of P.
 % 2. Formulate a mathematical program for minimizing the standardized discrepancy.
@@ -45,11 +45,12 @@ switch discrep_string
         ub_LP = Inf*ones(1, 2*k + q);
         
         % Solve linear prgram (suppress outputs)
-        options = optimoptions('linprog','Display','none');
-        [~, D_x0v1] = linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP, options);
-        [~, D_x0] =  glpkcc(f_LP,A_LP, b_LP, lb_LP, ub_LP,repmat('U',size(A_LP,1),1),repmat('C',size(A_LP,2),1),1,struct('savefilename','SimpleLP'));
-        if abs(D_x0v1-D_x0) > 10^(-5)
-            disp('Error, linprog and glpkcc solvers do not agree')
+        switch LP_solver_string
+            case 'MATLAB'        
+                options = optimoptions('linprog','Display','none');
+                [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP, options);
+            case 'glpk'        
+                [~, D_x0] =  glpkcc(f_LP, A_LP, b_LP, lb_LP, ub_LP, repmat('U',size(A_LP,1),1), repmat('C',size(A_LP,2),1), 1, struct('savefilename','SimpleLP'));
         end
         
     case 'ell2' % D_2 standardized discrepancy
@@ -80,8 +81,13 @@ switch discrep_string
         b_LP = [b; -sqrt(n_vec./sample_var).*sample_mean; sqrt(n_vec./sample_var).*sample_mean];
         
         % Solve linear program (suppress outputs)
-        options = optimoptions('linprog','Display','none');
-        [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], [], [], options);
+        switch LP_solver_string
+            case 'MATLAB'        
+                options = optimoptions('linprog','Display','none');
+                [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], [], [], options);
+            case 'glpk'
+                [~, D_x0] =  glpkcc(f_LP, A_LP, b_LP, -Inf*ones(size(A_LP,2),1), Inf*ones(size(A_LP,2),1), repmat('U',size(A_LP,1),1), repmat('C',size(A_LP,2),1), 1, struct('savefilename','SimpleLP'));
+        end
         
     case 'CRN' % D_crn standardized discrepancy
             

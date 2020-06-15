@@ -21,7 +21,8 @@ exp_set(12,:) = [55,76]; % avoid singular covariance matrix my perturbing soluti
 
 n_vec = 10*ones(k, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha
-discrep_string = 'CRN'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
+discrep_string = 'ell1'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
 fn_props = 'lipschitz_proj'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = 3; % gamma for Lipschitz constant
+LP_solver_string = 'glpk'; % {'MATLAB', 'glpk'}
 clear('A', 'B', 'C', 'IDX', 'scrXn');

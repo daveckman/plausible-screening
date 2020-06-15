@@ -83,7 +83,7 @@ for m = 1:M
     % SCREENING (USING DIFFERENT DISCREPANCIES)
     discrep_string = 'ell1';
     fprintf('Screening solutions in parallel for %s discrepancy...\n', discrep_string)
-    [S_indicators_d1(:,m), ~, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params);
+    [S_indicators_d1(:,m), ~, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d1(:,m)))
@@ -91,7 +91,7 @@ for m = 1:M
 
     discrep_string = 'ell2';
     fprintf('Screening solutions in parallel for %s discrepancy...\n', discrep_string)
-    [S_indicators_d2(:,m), ~, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params);
+    [S_indicators_d2(:,m), ~, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d2(:,m)))  
@@ -99,7 +99,7 @@ for m = 1:M
 
     discrep_string = 'ellinf';
     fprintf('Screening solutions in parallel for %s discrepancy...\n', discrep_string)
-    [S_indicators_dinf(:,m), ~, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params);
+    [S_indicators_dinf(:,m), ~, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_dinf(:,m)))

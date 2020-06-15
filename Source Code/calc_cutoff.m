@@ -2,7 +2,7 @@ function D_cutoff  = calc_cutoff(k, n_vec, alpha, discrep_string)
 
 % Calculate the uniform cutoff for a given standardized discrepancy
 
-n_MC_reps = 10000; % Number of Monte Carlo replications for estimation
+n_MC_reps = 100000; % Number of Monte Carlo replications for estimation
 
 switch discrep_string
     case 'ell1'
