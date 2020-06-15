@@ -17,6 +17,7 @@ kmeans_rng = RandStream.create('mlfg6331_64');
 opts = statset('Streams',kmeans_rng,'UseSubstreams',1);
 [IDX, C] = kmeans(scrXn,25,'Options',opts);
 exp_set = round(C);
+exp_set(12,:) = [55,76]; % avoid singular covariance matrix my perturbing solution
 
 n_vec = 10*ones(k, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha
