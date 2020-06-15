@@ -8,6 +8,7 @@ function [outputs] = normacle(oracle_rngs, solution, n_reps)
 
 % Unpack random number streams
 noise_stream = oracle_rngs{1};
+RandStream.setGlobalStream(noise_stream)
 
 % Initialize for storage
 outputs = zeros(1, n_reps);
@@ -19,7 +20,6 @@ for j = 1:n_reps
     noise_stream.Substream = j;
     
     % Generate noise
-    RandStream.setGlobalStream(noise_stream)
     noise = normrnd(0, norm(solution, 2) + 0.1);
     
     % Add noise to expected value function

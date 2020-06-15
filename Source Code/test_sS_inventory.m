@@ -11,11 +11,16 @@ scrXn = [feas_region;...
     repmat(feas_region(feas_region(:,2)==10,:),[5,1]);
     repmat(feas_region(feas_region(:,2)==100,:),[5,1])];
 k = 25;
-[IDX, C] = kmeans(scrXn,25);
+
+% Reproduce same exp set
+kmeans_rng = RandStream.create('mlfg6331_64');
+opts = statset('Streams',kmeans_rng,'UseSubstreams',1);
+[IDX, C] = kmeans(scrXn,25,'Options',opts);
 exp_set = round(C);
+
 n_vec = 10*ones(k, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha
-discrep_string = 'ell1'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
+discrep_string = 'CRN'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
 fn_props = 'lipschitz_proj'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = 3; % gamma for Lipschitz constant
 clear('A', 'B', 'C', 'IDX', 'scrXn');

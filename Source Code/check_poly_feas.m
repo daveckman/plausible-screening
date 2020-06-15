@@ -30,7 +30,7 @@ switch discrep_string
         
     case 'ell2' % D_2 standardized discrepancy
        
-        bprime = b + D_cutoff * (A.^2)*(sample_var./n_vec); 
+        bprime = b + sqrt(D_cutoff * (A.^2)*(sample_var./n_vec)); 
         
     case 'ellinf' % D_inf standardized discrepancy
 
@@ -38,7 +38,7 @@ switch discrep_string
         
     case 'CRN' % D_crn standardized discrepancy
         
-        bprime = b + D_cutoff * 1/n_vec(1)*sum((A*sample_var).*A,2);
+        bprime = b + sqrt(D_cutoff * 1/n_vec(1)*sum((A*sample_var).*A,2));
         
 end % end switch
 

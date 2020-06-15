@@ -9,6 +9,7 @@ function [outputs] = sS_oracle(oracle_rngs, solution, n_reps)
 
 % Unpack random number streams
 demand_stream = oracle_rngs{1};
+RandStream.setGlobalStream(demand_stream);
 
 % Unpack (s,S) policy to evaluate
 s = solution(1);
