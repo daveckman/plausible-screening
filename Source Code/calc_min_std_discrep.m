@@ -50,7 +50,7 @@ switch discrep_string
                 options = optimoptions('linprog','Display','none');
                 [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP, options);
             case 'glpk'        
-                [~, D_x0] =  glpkcc(f_LP, A_LP, b_LP, lb_LP, ub_LP, repmat('U',size(A_LP,1),1), repmat('C',size(A_LP,2),1), 1, struct('savefilename','SimpleLP'));
+                [~, D_x0] = glpkcc(f_LP, A_LP, b_LP, lb_LP, ub_LP, repmat('U',size(A_LP,1),1), repmat('C',size(A_LP,2),1), 1, struct('savefilename','SimpleLP'));
         end
         
     case 'ell2' % D_2 standardized discrepancy
@@ -66,8 +66,9 @@ switch discrep_string
         opt_val_offset = (n_vec./sample_var)'*sample_mean.^2;
         
         % Solve quadratic program (suppress outputs)
-        options = optimoptions('quadprog','Display','none');
-        [~, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP, [], [], [], [], [], options);
+        %options = optimoptions('quadprog','Display','none');
+        %[~, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP, [], [], [], [], [], options);
+        [m_opt, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP);
         D_x0 = f_val + opt_val_offset;
         
     case 'ellinf' % D_inf standardized discrepancy

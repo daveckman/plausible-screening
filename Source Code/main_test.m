@@ -19,7 +19,8 @@ clc;
 % test_norm_k3;
 % test_norm_3d;
 % test_norm_5d;
-test_sS_inventory;
+% test_sS_inventory;
+test_tandem_production;
 
 
 %%
