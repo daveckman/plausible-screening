@@ -56,7 +56,7 @@ end
 
 %% RUN MACROREPLICATIONS
 
-M = 2; % Number of macroreplications
+M = 200; % Number of macroreplications
 card_feas_region = size(feas_region, 1);
 
 % Initialize data storage
@@ -108,99 +108,142 @@ for m = 1:M
 end
 
 %%
+% ESTIMATE TRUE OBJECTIVE FUNCTION
+M_MC = 500;
+outputs = zeros(card_feas_region, M_MC);
+
+oracle_rngs = {RandStream.create('mrg32k3a')};
+
+for i = 1:card_feas_region
+    % Extract solution x_i and sample size n_i
+    x_i = feas_region(i,:);
+
+    % Reset each stream to substream 1
+    for r = 1:oracle_n_rngs
+        oracle_rng = oracle_rngs{r};
+        oracle_rng.Substream = 1;
+    end
+
+    % Take n_i replications at x_i
+    outputs(i,:) = tandem_oracle(oracle_rngs, x_i, M_MC);
+end
+
+% Calculate summary statistics
+est_true_mean = mean(outputs,2);
+
+%%
 % PLOTTING SUBSETS
 
 figure
 subplot(1, 2, 1);
 
-C = sum(S_indicators_d1,2)'/M;
-scatter(1:99, C, 'bo','markerfacecolor','b');
 axis square
-hold on
-
-plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
 xlim([0,1])
 ylim([0,1])
 xlabel('Mean Cycle Time of Machine 1','interpreter','latex')
 ylabel('$P(x_0 \in S)$','interpreter','latex')
 title('$d^1$ discrepancy (standard PO)', 'interpreter', 'latex')
+
+hold on
+yyaxis left
+C = sum(S_indicators_d1,2)'/M;
+scatter(feas_region(:,1), C, 'bo','markerfacecolor','b')
+plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
+yyaxis right
+plot(feas_region(:,1),est_true_mean,'r-')
 hold off
 
 subplot(1, 2, 2);
 
-C = sum(S_poly_indicators_d1,2)'/M;
-scatter(1:99, C, 'bo','markerfacecolor','b');
 axis square
-hold on
-
-plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
 xlim([0,1])
 ylim([0,1])
 xlabel('Mean Cycle Time of Machine 1','interpreter','latex')
 ylabel('$P(x_0 \in S)$','interpreter','latex')
 title('$d^1$ discrepancy (relaxed PO)', 'interpreter', 'latex')
+
+hold on
+yyaxis left
+C = sum(S_poly_indicators_d1,2)'/M;
+scatter(feas_region(:,1), C, 'bo','markerfacecolor','b')
+plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
+yyaxis right
+plot(feas_region(:,1),est_true_mean,'r-')
 hold off
 
 figure;
 subplot(1, 2, 1);
 
-C = sum(S_indicators_d2,2)'/M;
-scatter(1:99, C, 'bo','markerfacecolor','b');
-axis square
-hold on
 
-plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
+axis square
 xlim([0,1])
 ylim([0,1])
 xlabel('Mean Cycle Time of Machine 1','interpreter','latex')
 ylabel('$P(x_0 \in S)$','interpreter','latex')
 title('$d^2$ discrepancy (standard PO)', 'interpreter', 'latex')
+
+hold on
+yyaxis left
+C = sum(S_indicators_d2,2)'/M;
+scatter(feas_region(:,1), C, 'bo','markerfacecolor','b')
+plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
+yyaxis right
+plot(feas_region(:,1),est_true_mean,'r-')
 hold off
 
 subplot(1, 2, 2);
 
-C = sum(S_poly_indicators_d2,2)'/M;
-scatter(1:99, C, 'bo','markerfacecolor','b');
 axis square
-hold on
-
-plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
 xlim([0,1])
 ylim([0,1])
 xlabel('Mean Cycle Time of Machine 1','interpreter','latex')
 ylabel('$P(x_0 \in S)$','interpreter','latex')
 title('$d^2$ discrepancy (relaxed PO)', 'interpreter', 'latex')
+
+hold on
+yyaxis left
+C = sum(S_poly_indicators_d2,2)'/M;
+scatter(feas_region(:,1), C, 'bo','markerfacecolor','b')
+plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
+yyaxis right
+plot(feas_region(:,1),est_true_mean,'r-')
 hold off
 
 figure;
 subplot(1, 2, 1)
 
-C = sum(S_indicators_dinf,2)'/M;
-scatter(1:99, C, 'bo','markerfacecolor','b');
 axis square
-hold on
-
-plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
 xlim([0,1])
 ylim([0,1])
 xlabel('Mean Cycle Time of Machine 1','interpreter','latex')
 ylabel('$P(x_0 \in S)$','interpreter','latex')
 title('$d^\infty$ discrepancy (standard PO)', 'interpreter', 'latex')
+
+hold on
+yyaxis left
+C = sum(S_indicators_dinf,2)'/M;
+scatter(feas_region(:,1), C, 'bo','markerfacecolor','b')
+plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
+yyaxis right
+plot(feas_region(:,1),est_true_mean,'r-')
 hold off
 
 subplot(1, 2, 2);
 
-C = sum(S_poly_indicators_dinf,2)'/M;
-scatter(1:99, C, 'bo','markerfacecolor','b');
 axis square
-hold on
-
-plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
 xlim([0,1])
 ylim([0,1])
 xlabel('Mean Cycle Time of Machine 1','interpreter','latex')
 ylabel('$P(x_0 \in S)$','interpreter','latex')
 title('$d^\infty$ discrepancy (relaxed PO)', 'interpreter', 'latex')
+
+hold on
+yyaxis left
+C = sum(S_poly_indicators_dinf,2)'/M;
+scatter(feas_region(:,1), C, 'bo','markerfacecolor','b');
+plot(exp_set(:,1),zeros(1,k),'kd','markerfacecolor','k')
+yyaxis right
+plot(feas_region(:,1),est_true_mean,'r-')
 hold off
 
 %% PLOTTING SUBSET SIZES (ECDFS)

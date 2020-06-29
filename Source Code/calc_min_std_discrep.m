@@ -60,15 +60,15 @@ switch discrep_string
         
         % Formulate as quadratic program  
         H_QP = [2*spdiags(n_vec./sample_var,0,k,k), zeros(k,q); zeros(q,k), zeros(q,q)];
+        H_QP_reg = H_QP + 0.00001*speye(k + q);
         f_QP = [-2*n_vec./sample_var.*sample_mean; zeros(q,1)];
         A_QP = [A, C];
         b_QP = b;
         opt_val_offset = (n_vec./sample_var)'*sample_mean.^2;
         
         % Solve quadratic program (suppress outputs)
-        %options = optimoptions('quadprog','Display','none');
-        %[~, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP, [], [], [], [], [], options);
-        [m_opt, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP);
+        options = optimoptions('quadprog','Display','none');
+        [~, f_val] = quadprog(H_QP_reg, f_QP, A_QP, b_QP, [], [], [], [], [], options);
         D_x0 = f_val + opt_val_offset;
         
     case 'ellinf' % D_inf standardized discrepancy
