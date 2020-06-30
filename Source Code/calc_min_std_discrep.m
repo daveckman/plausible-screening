@@ -71,6 +71,13 @@ switch discrep_string
         [~, f_val] = quadprog(H_QP_reg, f_QP, A_QP, b_QP, [], [], [], [], [], options);
         D_x0 = f_val + opt_val_offset;
         
+        % GLPK options (slower and less reliable)       
+        %[~, f_val] = qpng(H_QP_reg, f_QP, A_QP, b_QP);
+        %init_sol = [((n_vec./sample_var)'*sample_mean)/(n_vec'*sample_var)*ones(k,1); zeros(q, 1)];
+        %[x_opt, ~, ~, ~] = qpsolng(H_QP_reg, f_QP, [], [], A_QP, b_QP, init_sol);
+        %f_val = 0.5 * x_opt' * H_QP * x_opt + f_QP' * x_opt; 
+        %D_x0 = f_val + opt_val_offset;
+        
     case 'ellinf' % D_inf standardized discrepancy
 
         % Optimization problem
