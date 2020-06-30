@@ -77,5 +77,8 @@ else % otherwise do independent sampling
     
 end % end if
 
+% Avoid sample variances of zero;
+sample_var(sample_var == 0) = 0.00001;
+
 end
 

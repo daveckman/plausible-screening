@@ -20,7 +20,8 @@ clc;
 % test_norm_3d;
 % test_norm_5d;
 % test_sS_inventory;
-test_tandem_production;
+% test_tandem_production;
+test_newsvendor;
 
 
 %%
