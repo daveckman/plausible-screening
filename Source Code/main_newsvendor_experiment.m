@@ -351,7 +351,7 @@ xlim([0,card_feas_region])
 
 xlabel('Subset Size ($s$)', 'Interpreter', 'latex')
 ylabel('P($|S| \leq s$)', 'Interpreter', 'latex')
-leg1 = legend('$d^1$ standard', '$d^1$ relaxed', '$d^2$ standard', '$d^2$ relaxed', '$d^{\infty}$ standard', '$d^{\infty}$ relaxed', 'location', 'southeast');
+leg1 = legend('$d^1$ standard', '$d^1$ relaxed', '$d^2$ standard', '$d^2$ relaxed', '$d^{\infty}$ standard', '$d^{\infty}$ relaxed', 'location', 'northwest');
 legend boxoff
 set(leg1,'Interpreter','latex');
 set(gca, 'FontSize', 14, 'LineWidth', 2)
