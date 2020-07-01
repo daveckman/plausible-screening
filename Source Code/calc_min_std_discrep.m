@@ -1,4 +1,4 @@
-function D_x0 = calc_min_std_discrep(discrep_string, A, C, b, sample_mean, sample_var, n_vec, LP_solver_string)
+function D_x0 = calc_min_std_discrep(discrep_string, A, C, b, sample_mean, sample_var, n_vec, LP_solver_string, varargin)
 
 % 1. Take polyhedral representation of P.
 % 2. Formulate a mathematical program for minimizing the standardized discrepancy.
@@ -11,6 +11,9 @@ k = size(A,2); % Number of solutions in experimental set
 q = size(C,2); % Number of unprojected components
 
 % MATLAB's linprog() and quadprog() functions take the following arguments.
+if nargin > 8
+    init_sol = varargin{1};
+end
 
 % linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP) solves a linear program of the form
 %   min_x f_LP'*x s.t. A_LP*x <= b_LP where lb_LP <= x <= ub_LP
@@ -47,7 +50,7 @@ switch discrep_string
         % Solve linear prgram (suppress outputs)
         switch LP_solver_string
             case 'MATLAB'        
-                options = optimoptions('linprog','Display','none');
+                options = optimoptions('linprog','Display','none','OptimalityTolerance',10^(-3));
                 [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP, options);
             case 'glpk'        
                 [~, D_x0] = glpkcc(f_LP, A_LP, b_LP, lb_LP, ub_LP, repmat('U',size(A_LP,1),1), repmat('C',size(A_LP,2),1), 1, struct('savefilename','SimpleLP'));
@@ -67,9 +70,15 @@ switch discrep_string
         opt_val_offset = (n_vec./sample_var)'*sample_mean.^2;
         
         % Solve quadratic program (suppress outputs)
-        options = optimoptions('quadprog','Display','none');
-        [~, f_val] = quadprog(H_QP_reg, f_QP, A_QP, b_QP, [], [], [], [], [], options);
-        D_x0 = f_val + opt_val_offset;
+        if exist('init_sol','var')
+            options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3),'Algorithm','active-set');
+            [~, f_val] = quadprog(H_QP_reg, f_QP, A_QP, b_QP, [], [], [], [], init_sol, options);
+            D_x0 = f_val + opt_val_offset;
+        else
+            options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3));
+            [~, f_val] = quadprog(H_QP_reg, f_QP, A_QP, b_QP, [], [], [], [], [], options);
+            D_x0 = f_val + opt_val_offset;
+        end
         
         % GLPK options (slower and less reliable)       
         %[~, f_val] = qpng(H_QP_reg, f_QP, A_QP, b_QP);
@@ -91,7 +100,7 @@ switch discrep_string
         % Solve linear program (suppress outputs)
         switch LP_solver_string
             case 'MATLAB'        
-                options = optimoptions('linprog','Display','none');
+                options = optimoptions('linprog','Display','none','OptimalityTolerance',10^(-3));
                 [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], [], [], options);
             case 'glpk'
                 [~, D_x0] =  glpkcc(f_LP, A_LP, b_LP, -Inf*ones(size(A_LP,2),1), Inf*ones(size(A_LP,2),1), repmat('U',size(A_LP,1),1), repmat('C',size(A_LP,2),1), 1, struct('savefilename','SimpleLP'));
@@ -110,7 +119,7 @@ switch discrep_string
         opt_val_offset = n_vec(1)*sample_mean'*(sample_var\sample_mean);
         
         % Solve quadratic program (suppress outputs)
-        options = optimoptions('quadprog','Display','none');
+        options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3));
         [~, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP, [], [], [], [], [], options);
         D_x0 = f_val + opt_val_offset;
             
