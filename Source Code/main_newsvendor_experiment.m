@@ -56,7 +56,7 @@ end
 
 %% RUN MACROREPLICATIONS
 
-M = 200; % Number of macroreplications
+M = 5; % Number of macroreplications
 card_feas_region = size(feas_region, 1);
 
 % Initialize data storage
@@ -78,12 +78,12 @@ for m = 1:M
     
     % Generate data and calculate summary statistics
     fprintf('Generating sample data in parallel...\n')
-    [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, discrep_string);
+    [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
 
     % SCREENING (USING DIFFERENT DISCREPANCIES)
     discrep_string = 'ell1';
     fprintf('Screening solutions in parallel for %s discrepancy...\n', discrep_string)
-    [S_indicators_d1(:,m), ~, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
+    [S_indicators_d1(:,m), D_x0s, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d1(:,m)))
@@ -91,7 +91,7 @@ for m = 1:M
 
     discrep_string = 'ell2';
     fprintf('Screening solutions in parallel for %s discrepancy...\n', discrep_string)
-    [S_indicators_d2(:,m), ~, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
+    [S_indicators_d2(:,m), D_x0s, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d2(:,m)))  
@@ -99,7 +99,7 @@ for m = 1:M
 
     discrep_string = 'ellinf';
     fprintf('Screening solutions in parallel for %s discrepancy...\n', discrep_string)
-    [S_indicators_dinf(:,m), ~, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
+    [S_indicators_dinf(:,m), D_x0s, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_dinf(:,m)))
@@ -340,12 +340,12 @@ end
 figure
 hold on
 
-plot([1:card_feas_region], ecdf_d1, 'b-', 'LineWidth', 2);
-plot([1:card_feas_region], ecdf_d1_poly, 'b:','LineWidth', 2);
-plot([1:card_feas_region], ecdf_d2, 'r-', 'LineWidth', 2);
-plot([1:card_feas_region], ecdf_d2_poly, 'r:', 'LineWidth', 2);
-plot([1:card_feas_region], ecdf_dinf, 'g-', 'LineWidth', 2);
-plot([1:card_feas_region], ecdf_dinf_poly, 'g:', 'LineWidth', 2);
+stairs([1:card_feas_region], ecdf_d1, 'b-', 'LineWidth', 2);
+stairs([1:card_feas_region], ecdf_d1_poly, 'b:','LineWidth', 2);
+stairs([1:card_feas_region], ecdf_d2, 'r-', 'LineWidth', 2);
+stairs([1:card_feas_region], ecdf_d2_poly, 'r:', 'LineWidth', 2);
+stairs([1:card_feas_region], ecdf_dinf, 'g-', 'LineWidth', 2);
+stairs([1:card_feas_region], ecdf_dinf_poly, 'g:', 'LineWidth', 2);
 
 xlim([0,card_feas_region])
 

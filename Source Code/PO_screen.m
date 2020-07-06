@@ -17,7 +17,7 @@ PO_info_handle = str2func(strcat('setup_',fn_props));
 card_feas_region = size(feas_region, 1);
 S_indicators = zeros(card_feas_region, 1);
 S_poly_indicators = zeros(card_feas_region, 1);
-D_x0s = zeros(card_feas_region, 1);
+D_x0s = Inf*ones(card_feas_region, 1);
 zs = zeros(card_feas_region, 1);
 
 for l = 1:card_feas_region
