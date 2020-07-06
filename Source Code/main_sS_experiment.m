@@ -56,7 +56,7 @@ end
 
 %% RUN MACROREPLICATIONS
 
-M = 100; % Number of macroreplications
+M = 1; % Number of macroreplications
 card_feas_region = size(feas_region, 1);
 
 % Initialize data storage
@@ -70,41 +70,49 @@ S_poly_indicators_dinf = zeros(card_feas_region, M);
 %S_poly_indicators_dcrn = zeros(card_feas_region, M);
 
 
-for m = 1:M
+parfor m = 1:M
     
     fprintf('Running macrorep %d of %d.\n', m, M)
     
     % SAMPLING
     
-    % Generate data and calculate summary statistics
-    fprintf('Generating sample data in parallel...\n')
-    [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, discrep_string);
-
+    % Generate data and calculate summary statistics (iid sampling)
+    fprintf('Generating sample data with i.i.d. sampling... ')
+    [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
+    fprintf('Done.\n')
+    
     % SCREENING (USING DIFFERENT DISCREPANCIES)
     discrep_string = 'ell1';
-    fprintf('Screening solutions in parallel for %s discrepancy...\n', discrep_string)
+    fprintf('Screening solutions for %s discrepancy... ', discrep_string)
     [S_indicators_d1(:,m), ~, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
+    fprintf('Done.\n')
     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d1(:,m)))
     fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_d1(:,m)))
 
     discrep_string = 'ell2';
-    fprintf('Screening solutions in parallel for %s discrepancy...\n', discrep_string)
+    fprintf('Screening solutions for %s discrepancy... ', discrep_string)
     [S_indicators_d2(:,m), ~, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
+    fprintf('Done.\n')
     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d2(:,m)))  
     fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_d2(:,m)))
 
     discrep_string = 'ellinf';
-    fprintf('Screening solutions in parallel for %s discrepancy...\n', discrep_string)
+    fprintf('Screening solutions for %s discrepancy... ', discrep_string)
     [S_indicators_dinf(:,m), ~, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
+    fprintf('Done.\n')
     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_dinf(:,m)))
     fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_dinf(:,m)))
 
+    % Generate data and calculate summary statistics
+%    fprintf('Generating sample data with CRN...\n')
+%    [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
+    
 end
 
 %%
