@@ -13,6 +13,8 @@ q = size(C,2); % Number of unprojected components
 % MATLAB's linprog() and quadprog() functions take the following arguments.
 if nargin > 8
     init_sol = varargin{1};
+else
+    init_sol = [];
 end
 
 % linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP) solves a linear program of the form
@@ -50,7 +52,7 @@ switch discrep_string
         % Solve linear prgram (suppress outputs)
         switch LP_solver_string
             case 'MATLAB'        
-                options = optimoptions('linprog','Display','none','OptimalityTolerance',10^(-3));
+                options = optimoptions('linprog','Display','none','OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
                 [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP, options);
             case 'glpk'        
                 [~, D_x0] = glpkcc(f_LP, A_LP, b_LP, lb_LP, ub_LP, repmat('U',size(A_LP,1),1), repmat('C',size(A_LP,2),1), 1, struct('savefilename','SimpleLP'));
@@ -70,15 +72,17 @@ switch discrep_string
         opt_val_offset = (n_vec./sample_var)'*sample_mean.^2;
         
         % Solve quadratic program (suppress outputs)
-        if exist('init_sol','var')
-            options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3),'Algorithm','active-set');
-            [~, f_val] = quadprog(H_QP_reg, f_QP, A_QP, b_QP, [], [], [], [], init_sol, options);
-            D_x0 = f_val + opt_val_offset;
-        else
-            options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3));
-            [~, f_val] = quadprog(H_QP_reg, f_QP, A_QP, b_QP, [], [], [], [], [], options);
-            D_x0 = f_val + opt_val_offset;
-        end
+        options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
+        %init_sol = [((n_vec./sample_var)'*sample_mean)/(n_vec'*sample_var)*ones(k,1); zeros(q, 1)];
+        [~, f_val, exitflag, output] = quadprog(H_QP_reg, f_QP, A_QP, b_QP, [], [], [], [], init_sol, options);
+        D_x0 = f_val + opt_val_offset;
+        fprintf('exitflag = %d and output.iterations = %d.\n', exitflag, output.iterations);
+%         options = optimoptions('quadprog','Display','none');
+%         [~, f_val] = quadprog(H_QP_reg, f_QP, A_QP, b_QP, [], [], [], [], init_sol, options); 
+%         D_x02 = f_val + opt_val_offset;
+%         if abs(D_x0 - D_x02) > 0.001
+%             fprintf('Disagree. abs diff = %f, rel diff = %f.\n', abs(D_x0 - D_x02), abs(D_x0 - D_x02)/D_x0)
+%         end
         
         % GLPK options (slower and less reliable)       
         %[~, f_val] = qpng(H_QP_reg, f_QP, A_QP, b_QP);
@@ -100,7 +104,7 @@ switch discrep_string
         % Solve linear program (suppress outputs)
         switch LP_solver_string
             case 'MATLAB'        
-                options = optimoptions('linprog','Display','none','OptimalityTolerance',10^(-3));
+                options = optimoptions('linprog','Display','none','OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
                 [~, D_x0] = linprog(f_LP, A_LP, b_LP, [], [], [], [], options);
             case 'glpk'
                 [~, D_x0] =  glpkcc(f_LP, A_LP, b_LP, -Inf*ones(size(A_LP,2),1), Inf*ones(size(A_LP,2),1), repmat('U',size(A_LP,1),1), repmat('C',size(A_LP,2),1), 1, struct('savefilename','SimpleLP'));
@@ -119,7 +123,7 @@ switch discrep_string
         opt_val_offset = n_vec(1)*sample_mean'*(sample_var\sample_mean);
         
         % Solve quadratic program (suppress outputs)
-        options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3));
+        options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
         [~, f_val] = quadprog(H_QP, f_QP, A_QP, b_QP, [], [], [], [], [], options);
         D_x0 = f_val + opt_val_offset;
             
