@@ -56,7 +56,7 @@ end
 
 %% RUN MACROREPLICATIONS
 
-M = 5; % Number of macroreplications
+M = 200; % Number of macroreplications
 card_feas_region = size(feas_region, 1);
 
 % Initialize data storage
@@ -70,7 +70,7 @@ S_poly_indicators_dinf = zeros(card_feas_region, M);
 %S_poly_indicators_dcrn = zeros(card_feas_region, M);
 
 
-for m = 1:M
+parfor m = 1:M
     
     fprintf('Running macrorep %d of %d.\n', m, M)
     

@@ -37,7 +37,6 @@ if strcmp(discrep_string, 'CRN') == 1
         outputs(i,:) = oracle_handle(oracle_rngs, x_i, n_i);
         
     end % end for
-    
     % Calculate summary statistics
     sample_mean = mean(outputs,2);
     sample_var = cov(outputs');
@@ -62,7 +61,7 @@ else % otherwise do independent sampling
         
         % Take n_i replications at x_i
         outputs = oracle_handle(oracle_rngs, x_i, n_i);
-        
+
         % Calculate summary statistics
         sample_mean(i) = mean(outputs);
         sample_var(i) = var(outputs);
@@ -72,7 +71,7 @@ else % otherwise do independent sampling
 end % end if
 
 % Avoid sample variances of zero;
-sample_var(sample_var == 0) = 0.00001;
+%sample_var(sample_var == 0) = 0.00001;
 
 end
 
