@@ -64,7 +64,7 @@ end
 
 %% RUN MACROREPLICATIONS
 
-M = 5; % Number of macroreplications
+M = 200; % Number of macroreplications
 
 % Initialize data storage
 S_indicators_d1 = zeros(card_feas_region, M);
@@ -83,34 +83,34 @@ parfor m = 1:M
     
     % SAMPLING
     
-    % Generate data and calculate summary statistics
-    fprintf('Generating sample data for plausible optima...\n')
-    [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
-
-    % SCREENING (USING DIFFERENT DISCREPANCIES)
-    discrep_string = 'ell1';
-    fprintf('Screening solutions for %s discrepancy...\n', discrep_string)
-    [S_indicators_d1(:,m), D_x0s, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
-    fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
-    fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
-    fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d1(:,m)))
-    fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_d1(:,m)))
-
-    discrep_string = 'ell2';
-    fprintf('Screening solutions for %s discrepancy...\n', discrep_string)
-    [S_indicators_d2(:,m), D_x0s, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
-    fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
-    fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
-    fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d2(:,m)))  
-    fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_d2(:,m)))
-
-    discrep_string = 'ellinf';
-    fprintf('Screening solutions for %s discrepancy...\n', discrep_string)
-    [S_indicators_dinf(:,m), D_x0s, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
-    fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
-    fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
-    fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_dinf(:,m)))
-    fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_dinf(:,m)))
+%     % Generate data and calculate summary statistics
+%     fprintf('Generating sample data for plausible optima...\n')
+%     [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
+% 
+%     % SCREENING (USING DIFFERENT DISCREPANCIES)
+%     discrep_string = 'ell1';
+%     fprintf('Screening solutions for %s discrepancy...\n', discrep_string)
+%     [S_indicators_d1(:,m), D_x0s, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
+%     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
+%     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
+%     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d1(:,m)))
+%     fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_d1(:,m)))
+% 
+%     discrep_string = 'ell2';
+%     fprintf('Screening solutions for %s discrepancy...\n', discrep_string)
+%     [S_indicators_d2(:,m), D_x0s, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
+%     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
+%     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
+%     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d2(:,m)))  
+%     fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_d2(:,m)))
+% 
+%     discrep_string = 'ellinf';
+%     fprintf('Screening solutions for %s discrepancy...\n', discrep_string)
+%     [S_indicators_dinf(:,m), D_x0s, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
+%     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
+%     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
+%     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_dinf(:,m)))
+%     fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_dinf(:,m)))
 
     % SCREENING (USING EXTENDED SCREEN TO THE BEST)
 
