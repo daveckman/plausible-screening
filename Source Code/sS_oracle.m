@@ -39,7 +39,7 @@ for j = 1:n_reps
             cost = cost + 32 + 3*(S-J);
             J = S;
         end
-        if J >= D % If inventory... incur oer-unit holding cost.
+        if J >= D % If inventory... incur per-unit holding cost.
             cost = cost + (J-D);
         else % If no inventory... incur per-unit shortage cost.
             cost = cost + 5*(D-J);
