@@ -2,7 +2,7 @@
 oracle_string = 'newsvendor_oracle';
 oracle_n_rngs = 1;
 feas_region = [1:100]';
-exp_set = [5:5:95]';
+exp_set = [3:5:100]';
 k = size(exp_set, 1);
 
 n_vec = 20*ones(k, 1); % col vector
