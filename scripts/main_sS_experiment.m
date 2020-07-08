@@ -3,56 +3,12 @@
 clear;
 clc;
 
-% SETUP
-% Run a script to initialize:
-%   oracle_string: string for the name of the oracle function
-%   oracle_n_rngs: number of rngs needed by the oracle
-%   feas_region: feasible region matrix (each row corresponds to a solution)
-%   exp_set: experimental set matrix (each row corresponds to a solution)
-%   k: number of evaluated solutions
-%   n_vec: column vector of sample sizes for each evaluated solution
-%   alpha: confidence level = 1-alpha
-%   discrep_string: string for discrepancy type {'ell1', 'ell2', 'ellinf', 'CRN'}
-%   fn_props: string for functional property {'convex', 'lipschitz', 'lipschitz_proj}
-%   prop_params: Lipschitz constant (if applicable)
+add_rm_paths('add');
 
-test_sS_inventory;
+problem_string = 'sS_inventory';
+[oracle_string, oracle_n_rngs, feas_region, exp_set, k, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string] = init_problem(problem_string);
 
-
-%%
-% CHECK FOR EXCEPTIONS
-
-accept_discreps = {'ell1', 'ell2', 'ellinf', 'CRN'};
-if ~any(strcmp(discrep_string, accept_discreps))
-    fprintf('\nERROR: "%s" is not a valid standardized discrepancy.\n', discrep_string)
-    fprintf('Please specify a valid standardized discrepancy:')
-    fprintf('\t%s', accept_discreps{:})
-    fprintf('.\n')
-    return
-end
-
-accept_fn_props = {'lipschitz', 'lipschitz_proj', 'convex'};
-if ~any(strcmp(fn_props, accept_fn_props))
-    fprintf('\nERROR: "%s" is not a valid functional property.\n', fn_props)
-    fprintf('Please specify a valid functional property:')
-    fprintf('\t%s', accept_fn_props{:})
-    fprintf('.\n')
-    return
-end
-
-if strcmp(discrep_string, 'CRN') == 1
-    % Check that all values in n_vec vector are equal
-    if min(n_vec) ~= max(n_vec)
-        fprintf('All sample sizes must be equal when using CRN.\n')
-        return
-    end
-    
-    % Check if n >= k so that sample_var is non-singular
-    if n_vec(1) < k
-        fprintf('Common sample size n = %d must be at least k = %d.\n', n_vec(1), k)
-        return
-    end
-end
+check_exceptions(discrep_string, fn_props, n_vec)
 
 %% RUN MACROREPLICATIONS
 
@@ -281,3 +237,5 @@ set(gca, 'FontSize', 14, 'LineWidth', 2)
 set(gcf,'units','inches','position',[1,1,9,4.5])
 
 hold off
+
+add_rm_paths('remove');
