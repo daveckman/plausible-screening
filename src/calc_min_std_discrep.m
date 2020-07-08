@@ -142,15 +142,15 @@ switch discrep_string
         b_QP = b;
         opt_val_offset = n_vec(1)*sample_mean(~zero_var_solns)'*(sample_var(~zero_var_solns,~zero_var_solns)\sample_mean(~zero_var_solns));
         
-%         Moore-Penrose pseudoinverse        
+%         % Moore-Penrose pseudoinverse        
 %         % Formulate as quadratic program
 %         H_QP = [2*n_vec(1)*pinv(sample_var(~zero_var_solns,~zero_var_solns)), zeros(k_bar,q); zeros(q,k_bar), zeros(q,q)];
-%         f_QP = [-2*n_vec(1)*(sample_mean(~zero_var_solns)'*pinv(sample_var(~zero_var_solns,~zero_var_solns))); zeros(q,1)];
+%         f_QP = [-2*n_vec(1)*(pinv(sample_var(~zero_var_solns,~zero_var_solns))*sample_mean(~zero_var_solns)); zeros(q,1)];
 %         A_QP = [A, C];
 %         b_QP = b;
 %         opt_val_offset = n_vec(1)*sample_mean(~zero_var_solns)'*pinv(sample_var(~zero_var_solns,~zero_var_solns))*sample_mean(~zero_var_solns);
 
-        % Solve quadratic program (suppress outputs)
+        % Solve quadratic program (suppress outputs) %'Display','none',
         options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
         [~, f_val, exitflag] = quadprog(H_QP, f_QP, A_QP, b_QP, [], [], [], [], [], options);
         D_x0 = f_val + opt_val_offset;

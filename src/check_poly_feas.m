@@ -38,7 +38,9 @@ switch discrep_string
         
     case 'CRN' % D_crn standardized discrepancy
         
-        bprime = b + sqrt(D_cutoff * 1/n_vec(1)*sum((A*sample_var).*A,2));
+        term = 1/n_vec(1)*sum((A*sample_var).*A,2);
+        term(term < 0) = 0; % avoid negative signed zeros leading to imag #s
+        bprime = b + sqrt(D_cutoff * term);
         
 end % end switch
 

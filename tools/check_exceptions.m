@@ -29,9 +29,9 @@ if strcmp(discrep_string, 'CRN') == 1
         return
     end
     
-    % Check if n >= k so that sample_var is non-singular
-    if n_vec(1) < length(n_vec)
-        fprintf('\nERROR: Common sample size n = %d must be at least k = %d.\n', n_vec(1), length(n_vec))
+    % Check if n > k so that sample_var is non-singular
+    if n_vec(1) <= length(n_vec)
+        fprintf('\nERROR: Common sample size n = %d must be strictly greater than k = %d.\n', n_vec(1), length(n_vec))
         return
     end
 end
