@@ -1,32 +1,26 @@
 % (s,S) inventory problem with 2 products
 oracle_string = 'sS_2prod_oracle';
-oracle_n_rngs = 1;
-[A,B] = meshgrid(10:80,10:100);
-single_feas_region = [A(:),B(:)];
-single_feas_region = single_feas_region(single_feas_region(:,1)+14.5 < single_feas_region(:,2),:);
+oracle_n_rngs = 2;
+
+ss1_vec = 10:40;
+QQ1_vec = 20:55;
+ss2_vec = 5:35;
+QQ2_vec = 5:40;
 
 % Cross designs
-[a, b] = ndgrid(1:size(single_feas_region,1), 1:size(single_feas_region,1));
-feas_region = [single_feas_region(a,:), single_feas_region(b,:)];
+card_feas_region = length(ss1_vec)*length(QQ1_vec)*length(ss2_vec)*length(QQ2_vec);
+[a, b, c, d] = ndgrid(ss1_vec, QQ1_vec, ss2_vec, QQ2_vec);
+feas_region = [reshape(a, card_feas_region, 1), reshape(b, card_feas_region, 1), reshape(c, card_feas_region, 1), reshape(d, card_feas_region, 1)];
 
-scrXn = [single_feas_region;...
-    repmat(single_feas_region(single_feas_region(:,1)-single_feas_region(:,2)==-15,:),[5,1]);
-    repmat(single_feas_region(single_feas_region(:,1)==10,:),[5,1]);
-    repmat(single_feas_region(single_feas_region(:,1)==80,:),[5,1]);
-    repmat(single_feas_region(single_feas_region(:,2)==10,:),[5,1]);
-    repmat(single_feas_region(single_feas_region(:,2)==100,:),[5,1])];
-k = 25;
-
-% Reproduce same exp set
-kmeans_rng = RandStream.create('mlfg6331_64');
-opts = statset('Streams',kmeans_rng,'UseSubstreams',1);
-[IDX, C] = kmeans(scrXn,25,'Options',opts);
-single_exp_set = round(C);
-single_exp_set(12,:) = [55,76]; % avoid singular covariance matrix my perturbing solution
+ss1_vec_eval = 10:5:40;
+QQ1_vec_eval = 20:5:55;
+ss2_vec_eval = 5:5:35;
+QQ2_vec_eval = 5:5:40;
 
 % Cross designs
-[a, b] = ndgrid(1:size(single_exp_set,1), 1:size(single_exp_set));
-exp_set = [single_exp_set(a,:), single_exp_set(b,:)];
+k = length(ss1_vec_eval)*length(QQ1_vec_eval)*length(ss2_vec_eval)*length(QQ2_vec_eval);
+[a, b, c, d] = ndgrid(ss1_vec_eval, QQ1_vec_eval, ss2_vec_eval, QQ2_vec_eval);
+exp_set = [reshape(a, k, 1), reshape(b, k, 1), reshape(c, k, 1), reshape(d, k, 1)];
 
 n_vec = 10*ones(k, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha
@@ -34,4 +28,4 @@ discrep_string = 'ell1'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
 fn_props = 'lipschitz_proj'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = 3; % gamma for Lipschitz constant
 LP_solver_string = 'glpk'; % {'MATLAB', 'glpk'}
-clear('A', 'B', 'C', 'IDX', 'scrXn', 'single_feas_region', 'single_exp_set', 'a', 'b');
+clear('card_feas_region', 'a', 'b', 'c', 'd', 'ss1_vec', 'ss1_vec_eval', 'QQ1_vec', 'QQ1_vec_eval', 'ss2_vec', 'ss2_vec_eval', 'QQ2_vec', 'QQ2_vec_eval');

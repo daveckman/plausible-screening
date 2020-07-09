@@ -21,8 +21,8 @@ avg_cost = zeros(2, n_reps);
 
 for system = 1:2
     % Unpack (s,S) policy to evaluate
-    s = solution(1 + 2*(system-1));
-    S = solution(2 + 2*(system-1));
+    ss = solution(1 + 2*(system-1)); % s
+    QQ = solution(2 + 2*(system-1)); % S - s
     
     % Unpack random number stream
     demand_stream = oracle_rngs{system};
@@ -31,26 +31,24 @@ for system = 1:2
     for j = 1:n_reps
 
         % Initialize
-        I = S;
+        I = ss + QQ;
         C = 0;
         
         % Generate all monthly demands up front
         Ds = poissrnd(lambda,[t,1]);
         
         % Simulate a t-month period
+        
         for k = 1:t
-            J = I;
-            D = Ds(k);
-            if J <= s % If stockout... reorder.
-                C = C + o + u*(S-J);
-                J = S;
-            end
-            if J >= D % If inventory... incur per-unit holding cost.
-                C = C + h*(J-D);
-            else % If no inventory... incur per-unit shortage cost.
-                C = C + b*(D-J);
-            end
-            I = J-D;
+            
+            reorder = (I < ss);
+            quantity = ss + QQ - I;
+            I = I + reorder * quantity;
+            C = C + reorder * (o + u * quantity);
+            I = I - Ds(k);
+            multiplier = h * (I > 0) - b * (I < 0);
+            C = C + I * multiplier;
+            
         end
         
         % Calculate average monthly cost
@@ -60,7 +58,7 @@ for system = 1:2
 end
 
 for j = 1:n_reps
-    outputs(j) = avg_cost(1, j) + avg_cost(2, j) - sqrt((solution(3) - 18)^2 + (solution(4) - 53)^2); 
+    outputs(j) = avg_cost(1, j) + avg_cost(2, j) - sqrt((solution(3) - 18)^2 + (solution(4) - 35)^2); 
 end
 
 end
