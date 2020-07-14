@@ -64,7 +64,7 @@ switch discrep_string
         % Solve linear prgram (suppress outputs)
         switch LP_solver_string
             case 'MATLAB'        
-                options = optimoptions('linprog','Display','none','OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
+                options = optimoptions('linprog','Display','none'); %,'OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
                 [~, D_x0, exitflag] = linprog(f_LP, A_LP, b_LP, [], [], lb_LP, ub_LP, options);
                 if exitflag == -2 % infeasible LP
                     D_x0 = Inf;
@@ -90,7 +90,7 @@ switch discrep_string
         opt_val_offset = (n_vec(~zero_var_solns)./sample_var(~zero_var_solns))'*sample_mean(~zero_var_solns).^2;
         
         % Solve quadratic program (suppress outputs)
-        options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
+        options = optimoptions('quadprog','Display','none'); %,'OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
         %init_sol = [((n_vec./sample_var)'*sample_mean)/(n_vec'*sample_var)*ones(k,1); zeros(q, 1)];
         [~, f_val, exitflag] = quadprog(H_QP_reg, f_QP, A_QP, b_QP, [], [], [], [], init_sol, options);
         D_x0 = f_val + opt_val_offset;
@@ -118,7 +118,7 @@ switch discrep_string
         % Solve linear program (suppress outputs)
         switch LP_solver_string
             case 'MATLAB'        
-                options = optimoptions('linprog','Display','none','OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
+                options = optimoptions('linprog','Display','none'); %,'OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
                 [~, D_x0, exitflag] = linprog(f_LP, A_LP, b_LP, [], [], [], [], options);
                 if exitflag == -2 % infeasible LP
                     D_x0 = Inf;
@@ -151,7 +151,7 @@ switch discrep_string
 %         opt_val_offset = n_vec(1)*sample_mean(~zero_var_solns)'*pinv(sample_var(~zero_var_solns,~zero_var_solns))*sample_mean(~zero_var_solns);
 
         % Solve quadratic program (suppress outputs) %'Display','none',
-        options = optimoptions('quadprog','Display','none','OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
+        options = optimoptions('quadprog','Display','none'); %,'OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
         [~, f_val, exitflag] = quadprog(H_QP, f_QP, A_QP, b_QP, [], [], [], [], [], options);
         D_x0 = f_val + opt_val_offset;
         if exitflag == -2 % infeasible LP

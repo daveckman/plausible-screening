@@ -21,7 +21,7 @@ end
 
 %% RUN MACROREPLICATIONS
 
-M = 10; % Number of macroreplications
+M = 200; % Number of macroreplications
 
 % Initialize data storage
 S_indicators_d1 = zeros(card_feas_region, M);
@@ -47,15 +47,23 @@ parfor m = 1:M
     
     % Screening (using d1, d2, and dinf discrepancies)
     
-    [S_indicators_d1(:,m), ~, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ell1', fn_props, prop_params, LP_solver_string);
+    [S_indicators_d1(:,m), D_x0_d1, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ell1', fn_props, prop_params, LP_solver_string);
     print_screening_results('PO', 'ell1', S_indicators_d1(:,m))
 
-    [S_indicators_d2(:,m), D_x0, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ell2', fn_props, prop_params, LP_solver_string);
+    [S_indicators_d2(:,m), D_x0_d2, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ell2', fn_props, prop_params, LP_solver_string);
     print_screening_results('PO', 'ell2', S_indicators_d2(:,m))
     
-    [S_indicators_dinf(:,m), ~, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ellinf', fn_props, prop_params, LP_solver_string);
+    [S_indicators_dinf(:,m), D_x0_dinf, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ellinf', fn_props, prop_params, LP_solver_string);
     print_screening_results('PO', 'ellinf', S_indicators_dinf(:,m))
-
+% 
+%     figure
+%     subplot(1,3,1)
+%     plot(D_x0_d1)
+%     subplot(1,3,2)
+%     plot(D_x0_d2)
+%     subplot(1,3,3)
+%     plot(D_x0_dinf)
+%     
     %______________________________________________________________
     
     % Generate data using i.i.d. sampling and calculate summary statistics
