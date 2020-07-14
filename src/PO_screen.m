@@ -1,4 +1,4 @@
-function [S_indicators, D_x0s, S_poly_indicators, zs] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string)
+function [S_indicators, D_x0s, S_poly_indicators, zs] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, discrep_string, D_cutoff, fn_props, prop_params, LP_solver_string)
 
 % Carry out plausible optima screening w.r.t. optimality.
 % Use given functional properties and specified discrepancy/confidence.
@@ -7,10 +7,6 @@ function [S_indicators, D_x0s, S_poly_indicators, zs] = PO_screen(feas_region, e
 %   - a column-vector of the minimum standardized discrepancies.
 %   - a column-vector of indicators on whether x0 in S^poly.
 %   - a column-vector of the optimal values to the feasibility LPs.
-
-% Calculate cutoff
-k = size(exp_set,1);
-D_cutoff = calc_cutoff(k, n_vec, alpha, discrep_string);
 
 PO_info_handle = str2func(strcat('setup_',fn_props));
 
