@@ -21,7 +21,7 @@ end
 
 %% RUN MACROREPLICATIONS
 
-M = 200; % Number of macroreplications
+M = 10; % Number of macroreplications
 
 % Initialize data storage
 S_indicators_d1 = zeros(card_feas_region, M);
@@ -44,15 +44,15 @@ parfor m = 1:M
     
     % Generate data using i.i.d. sampling and calculate summary statistics
     [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
-
+    
     % Screening (using d1, d2, and dinf discrepancies)
     
     [S_indicators_d1(:,m), ~, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ell1', fn_props, prop_params, LP_solver_string);
     print_screening_results('PO', 'ell1', S_indicators_d1(:,m))
 
-    [S_indicators_d2(:,m), ~, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ell2', fn_props, prop_params, LP_solver_string);
+    [S_indicators_d2(:,m), D_x0, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ell2', fn_props, prop_params, LP_solver_string);
     print_screening_results('PO', 'ell2', S_indicators_d2(:,m))
-
+    
     [S_indicators_dinf(:,m), ~, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ellinf', fn_props, prop_params, LP_solver_string);
     print_screening_results('PO', 'ellinf', S_indicators_dinf(:,m))
 
@@ -69,14 +69,14 @@ parfor m = 1:M
     %______________________________________________________________
 
 
-%     % Generate data using CRN and calculate summary statistics
-%     [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'CRN');
-% 
-%     % Screening (using CRN discrepancy)
-%     
-%     [S_indicators_dcrn(:,m), ~, S_poly_indicators_dcrn(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'CRN', fn_props, prop_params, LP_solver_string);
-%     print_screening_results('PO', 'ellCRN', S_indicators_dinf(:,m))
-%      
+    % Generate data using CRN and calculate summary statistics
+    %[sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'CRN');
+
+    % Screening (using CRN discrepancy)
+    
+    %[S_indicators_dcrn(:,m), ~, S_poly_indicators_dcrn(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'CRN', fn_props, prop_params, LP_solver_string);
+    %print_screening_results('PO', 'ellCRN', S_indicators_dinf(:,m))
+     
     %______________________________________________________________
 
     % Generate data using CRN and calculate summary statistics
@@ -98,9 +98,9 @@ shortage = 1; % per unit shortage cost
 wbl_scale = 50;
 wbl_shape = 2; 
 
-true_mean = zeros(1,100);
+true_mean = zeros(1,length(feas_region));
 neg_profit = @(D,Q) (cost*Q + shortage*(D - min(D,Q)) - sell_price*min(D,Q) - salvage*(Q - min(D,Q)));
-for i = 1:100
+for i = 1:length(true_mean)
     Q = feas_region(i);
     true_mean(i) = integral(@(D) neg_profit(D, Q).*wblpdf(D, wbl_scale, wbl_shape), 0, Inf);
 end
@@ -124,9 +124,6 @@ plot_1d_subset_prob(feas_region, exp_set, S_indicators_d2, true_mean, xaxlabel, 
 subplot(2, 2, 4);
 plot_1d_subset_prob(feas_region, exp_set, S_indicators_dinf, true_mean, xaxlabel, yyaxlabel, 'Plausible Optima: $d^{\infty}$', alpha)
 
-%% PLOTTING SUBSETS (CRN)
-
-
 %% PLOTTING SUBSET SIZES (ECDFS)
 
 all_S_indicators = {SS_indicators, S_indicators_d1, S_indicators_d2, S_indicators_dinf};
@@ -136,6 +133,6 @@ colors = {'k:', 'b-', 'g-', 'm-'};
 %figure('Position', [0, 0, 800, 400])
 plot_sample_size_ecdfs(all_S_indicators, string_names, colors)
 
-%%
+%% END
 
 add_rm_paths('remove');

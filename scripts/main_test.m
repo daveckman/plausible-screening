@@ -5,7 +5,7 @@ clc;
 
 add_rm_paths('add');
 
-problem_string = 'tandem_production'; % norm_k3, norm_3d, norm_5d, newsvendor, sS_inventory, tandem_production
+problem_string = 'cts_newsvendor'; % norm_k3, norm_3d, norm_5d, newsvendor, cts_newsvendor, sS_inventory, tandem_production
 [oracle_string, oracle_n_rngs, feas_region, exp_set, k, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string] = init_problem(problem_string);
 
 check_exceptions(discrep_string, fn_props, n_vec)
@@ -33,7 +33,8 @@ S_poly = feas_region(S_poly_indicators==1, :);
 
 %%
 % PRINT TO SCREEN
-print_screening_results(problem_string, feas_region, exp_set, 'PO', discrep_string, fn_props, S_indicators)
+print_problem_header(problem_string, feas_region, exp_set, fn_props)
+print_screening_results('PO', discrep_string, S_indicators)
 
 %%
 % PLOTTING
