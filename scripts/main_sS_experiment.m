@@ -10,10 +10,11 @@ problem_string = 'sS_inventory';
 
 check_exceptions(discrep_string, fn_props, n_vec)
 
+card_feas_region = size(feas_region, 1);
+
 %% RUN MACROREPLICATIONS
 
-M = 1; % Number of macroreplications
-card_feas_region = size(feas_region, 1);
+M = 3; % Number of macroreplications
 
 % Initialize data storage
 S_indicators_d1 = zeros(card_feas_region, M);
@@ -25,217 +26,103 @@ S_poly_indicators_d2 = zeros(card_feas_region, M);
 S_poly_indicators_dinf = zeros(card_feas_region, M);
 %S_poly_indicators_dcrn = zeros(card_feas_region, M);
 
+print_problem_header(problem_string, feas_region, exp_set, fn_props)
 
 parfor m = 1:M
     
-    fprintf('Running macrorep %d of %d.\n', m, M)
+    fprintf('\n\nRunning macrorep %d of %d.\n', m, M)
     
-    % SAMPLING
+    % Sampling
     
-    % Generate data and calculate summary statistics (iid sampling)
-    fprintf('Generating sample data with i.i.d. sampling... ')
+    % Generate data using i.i.d. sampling and calculate summary statistics
     [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
-    fprintf('Done.\n')
     
-    % SCREENING (USING DIFFERENT DISCREPANCIES)
-%     discrep_string = 'ell1';
-%     fprintf('Screening solutions for %s discrepancy... ', discrep_string)
-%     tic; [S_indicators_d1(:,m), ~, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
-%     toc; fprintf('Done.\n')
-%     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
-%     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
-%     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d1(:,m)))
-%     fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_d1(:,m)))
+    % Screening (using d1, d2, and dinf discrepancies)
+    
+    [S_indicators_d1(:,m), D_x0_d1, S_poly_indicators_d1(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ell1', fn_props, prop_params, LP_solver_string);
+    print_screening_results('PO', 'ell1', S_indicators_d1(:,m))
+    print_screening_results('PO relaxed', 'ell1', S_poly_indicators_d1(:,m))
 
-    discrep_string = 'ell2';
-    fprintf('Screening solutions for %s discrepancy... ', discrep_string)
-    tic; [S_indicators_d2(:,m), ~, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
-    toc; fprintf('Done.\n')
-    fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
-    fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
-    fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_d2(:,m)))  
-    fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_d2(:,m)))
 
-%     discrep_string = 'ellinf';
-%     tic; fprintf('Screening solutions for %s discrepancy... ', discrep_string)
-%     toc; [S_indicators_dinf(:,m), ~, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, discrep_string, fn_props, prop_params, LP_solver_string);
-%     fprintf('Done.\n')
-%     fprintf('\nResults of PO screening\n-------------------------------------------------------\n')
-%     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
-%     fprintf('\t# of solutions in PO subset: \t\t\t%d\n', sum(S_indicators_dinf(:,m)))
-%     fprintf('\t# of solutions in PO relaxed subset: \t%d\n\n', sum(S_poly_indicators_dinf(:,m)))
+    [S_indicators_d2(:,m), D_x0_d2, S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ell2', fn_props, prop_params, LP_solver_string);
+    print_screening_results('PO', 'ell2', S_indicators_d2(:,m))
+    print_screening_results('PO relaxed', 'ell2', S_poly_indicators_d2(:,m))
 
-%    Generate data and calculate summary statistics
-%    fprintf('Generating sample data with CRN...\n')
-%    [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
+    
+    [S_indicators_dinf(:,m), D_x0_dinf, S_poly_indicators_dinf(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'ellinf', fn_props, prop_params, LP_solver_string);
+    print_screening_results('PO', 'ellinf', S_indicators_dinf(:,m))
+    print_screening_results('PO relaxed', 'ellinf', S_poly_indicators_dinf(:,m))
+
+% 
+%     figure
+%     subplot(1,3,1)
+%     plot(D_x0_d1)
+%     subplot(1,3,2)
+%     plot(D_x0_d2)
+%     subplot(1,3,3)
+%     plot(D_x0_dinf)
+%     
+    %______________________________________________________________
+%     
+%     % Generate data using i.i.d. sampling and calculate summary statistics
+%     [sample_mean_SS, sample_var_SS] = generate_data(m, oracle_string, oracle_n_rngs, feas_region, n_vec_SS, 'ell1');
+% 
+%     % Screening (using extended screen-to-the-best)
+% 
+%     [SS_indicators(:,m)] = ExtSTB(card_feas_region, sample_mean_SS, sample_var_SS, n_vec_SS, alpha);
+%     print_screening_results('ESTB', '', SS_indicators(:,m))
+%     
+    %______________________________________________________________
+
+
+    % Generate data using CRN and calculate summary statistics
+    %[sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'CRN');
+
+    % Screening (using CRN discrepancy)
+    
+    %[S_indicators_dcrn(:,m), ~, S_poly_indicators_dcrn(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, alpha, 'CRN', fn_props, prop_params, LP_solver_string);
+    %print_screening_results('PO', 'ellCRN', S_indicators_dinf(:,m))
+     
+    %______________________________________________________________
+
+    % Generate data using CRN and calculate summary statistics
+    %[sample_mean_SS, sample_var_SS] = generate_data(m, oracle_string, oracle_n_rngs, feas_region, n_vec_SS, 'ell1');
+
+    % Screening (using extended screen-to-the-best)
+    % ????
     
 end
 
-%%
-% PLOTTING SUBSETS
+%% PLOTTING SUBSETS
 
-figure
-subplot(1, 2, 1);
+figure('Position', [0, 0, 600, 900])
 
-C = sum(S_indicators_d1,2)'/M;
-for k = 1:size(feas_region,1)
-    rectangle('Position',[feas_region(k,1)-C(k)/2  feas_region(k,2)-C(k)/2 C(k) C(k)],'facecolor',[0.2 0.8 0.8],'linestyle','none','Curvature',1)
-end
-axis square
-hold on
+subplot(3, 2, 1);
+plot_2d_sS_subset_prob(feas_region, exp_set, S_indicators_d1, 'PO: $d^1$')
 
-plot(exp_set(:,1),exp_set(:,2),'kd','markerfacecolor','k')
-vch = convhull(feas_region(:,1),feas_region(:,2));
-plot(feas_region(vch,1),feas_region(vch,2),'k-')
-xlim([min(feas_region(:,1))-5,max(feas_region(:,1))+5])
-ylim([min(feas_region(:,2))-5,max(feas_region(:,2))+5])
-xlabel('Reorder quantity','interpreter','latex')
-ylabel('Order-to quantity','interpreter','latex')
-title('$d^1$ discrepancy (standard PO)', 'interpreter', 'latex')
-hold off
+subplot(3, 2, 2);
+plot_2d_sS_subset_prob(feas_region, exp_set, S_poly_indicators_d1, 'PO relaxed: $d^1$')
 
-subplot(1, 2, 2);
+subplot(3, 2, 3);
+plot_2d_sS_subset_prob(feas_region, exp_set, S_indicators_d2, 'PO: $d^2$')
 
-C = sum(S_poly_indicators_d1,2)'/M;
-for k = 1:size(feas_region,1)
-    rectangle('Position',[feas_region(k,1)-C(k)/2  feas_region(k,2)-C(k)/2 C(k) C(k)],'facecolor',[0.8 0.2 0.2],'linestyle','none','Curvature',1)
-end
-axis square
-hold on
+subplot(3, 2, 4);
+plot_2d_sS_subset_prob(feas_region, exp_set, S_poly_indicators_d2, 'PO relaxed: $d^2$')
 
-plot(exp_set(:,1),exp_set(:,2),'kd','markerfacecolor','k')
-vch = convhull(feas_region(:,1),feas_region(:,2));
-plot(feas_region(vch,1),feas_region(vch,2),'k-')
-xlim([min(feas_region(:,1))-5,max(feas_region(:,1))+5])
-ylim([min(feas_region(:,2))-5,max(feas_region(:,2))+5])
-xlabel('Reorder quantity','interpreter','latex')
-ylabel('Order-to quantity','interpreter','latex')
-title('$d^1$ discrepancy (relaxed PO)', 'interpreter', 'latex')
-hold off
+subplot(3, 2, 5);
+plot_2d_sS_subset_prob(feas_region, exp_set, S_indicators_dinf, 'PO: $d^{\infty}$')
 
-figure;
-subplot(1, 2, 1);
-
-C = sum(S_indicators_d2,2)'/M;
-for k = 1:size(feas_region,1)
-    rectangle('Position',[feas_region(k,1)-C(k)/2  feas_region(k,2)-C(k)/2 C(k) C(k)],'facecolor',[0.2 0.8 0.8],'linestyle','none','Curvature',1)
-end
-axis square
-hold on
-
-plot(exp_set(:,1),exp_set(:,2),'kd','markerfacecolor','k')
-vch = convhull(feas_region(:,1),feas_region(:,2));
-plot(feas_region(vch,1),feas_region(vch,2),'k-')
-xlim([min(feas_region(:,1))-5,max(feas_region(:,1))+5])
-ylim([min(feas_region(:,2))-5,max(feas_region(:,2))+5])
-xlabel('Reorder quantity','interpreter','latex')
-ylabel('Order-to quantity','interpreter','latex')
-title('$d^2$ discrepancy (standard PO)', 'interpreter', 'latex')
-hold off
-
-subplot(1, 2, 2);
-
-C = sum(S_poly_indicators_d2,2)'/M;
-for k = 1:size(feas_region,1)
-    rectangle('Position',[feas_region(k,1)-C(k)/2  feas_region(k,2)-C(k)/2 C(k) C(k)],'facecolor',[0.8 0.2 0.2],'linestyle','none','Curvature',1)
-end
-axis square
-hold on
-
-plot(exp_set(:,1),exp_set(:,2),'kd','markerfacecolor','k')
-vch = convhull(feas_region(:,1),feas_region(:,2));
-plot(feas_region(vch,1),feas_region(vch,2),'k-')
-xlim([min(feas_region(:,1))-5,max(feas_region(:,1))+5])
-ylim([min(feas_region(:,2))-5,max(feas_region(:,2))+5])
-xlabel('Reorder quantity','interpreter','latex')
-ylabel('Order-to quantity','interpreter','latex')
-title('$d^2$ discrepancy (relaxed PO)', 'interpreter', 'latex')
-hold off
-
-figure;
-subplot(1, 2, 1)
-
-C = sum(S_indicators_dinf,2)'/M;
-for k = 1:size(feas_region,1)
-    rectangle('Position',[feas_region(k,1)-C(k)/2  feas_region(k,2)-C(k)/2 C(k) C(k)],'facecolor',[0.2 0.8 0.8],'linestyle','none','Curvature',1)
-end
-axis square
-hold on
-
-plot(exp_set(:,1),exp_set(:,2),'kd','markerfacecolor','k')
-vch = convhull(feas_region(:,1),feas_region(:,2));
-plot(feas_region(vch,1),feas_region(vch,2),'k-')
-xlim([min(feas_region(:,1))-5,max(feas_region(:,1))+5])
-ylim([min(feas_region(:,2))-5,max(feas_region(:,2))+5])
-xlabel('Reorder quantity','interpreter','latex')
-ylabel('Order-to quantity','interpreter','latex')
-title('$d^\infty$ discrepancy (standard PO)', 'interpreter', 'latex')
-hold off
-
-subplot(1, 2, 2);
-
-C = sum(S_poly_indicators_dinf,2)'/M;
-for k = 1:size(feas_region,1)
-    rectangle('Position',[feas_region(k,1)-C(k)/2  feas_region(k,2)-C(k)/2 C(k) C(k)],'facecolor',[0.8 0.2 0.2],'linestyle','none','Curvature',1)
-end
-axis square
-hold on
-
-plot(exp_set(:,1),exp_set(:,2),'kd','markerfacecolor','k')
-vch = convhull(feas_region(:,1),feas_region(:,2));
-plot(feas_region(vch,1),feas_region(vch,2),'k-')
-xlim([min(feas_region(:,1))-5,max(feas_region(:,1))+5])
-ylim([min(feas_region(:,2))-5,max(feas_region(:,2))+5])
-xlabel('Reorder quantity','interpreter','latex')
-ylabel('Order-to quantity','interpreter','latex')
-title('$d^\infty$ discrepancy (relaxed PO)', 'interpreter', 'latex')
-hold off
+subplot(3, 2, 6);
+plot_2d_sS_subset_prob(feas_region, exp_set, S_poly_indicators_dinf, 'PO relaxed: $d^{\infty}$')
 
 %% PLOTTING SUBSET SIZES (ECDFS)
 
-% Compute subset sizes
-subsize_d1 = sum(S_indicators_d1, 1);
-subsize_d1_poly = sum(S_poly_indicators_d1, 1);
-subsize_d2 = sum(S_indicators_d2, 1);
-subsize_d2_poly = sum(S_poly_indicators_d2, 1);
-subsize_dinf = sum(S_indicators_dinf, 1);
-subsize_dinf_poly = sum(S_poly_indicators_dinf, 1);
+all_S_indicators = {S_indicators_d1, S_poly_indicators_d1, S_indicators_d2, S_poly_indicators_d2, S_indicators_dinf, S_poly_indicators_dinf};
+string_names = {'PO: $d^1$', 'PO relaxed: $d^1$', 'PO: $d^2$', 'PO relaxed: $d^2$', 'PO: $d^{\infty}$', 'PO relaxed: $d^{\infty}$'};
+colors = {'b-', 'b:', 'g-', 'g:', 'm-', 'm:'};
 
-% Compute empirical cdf of expected sample size
-ecdf_d1 = zeros(1, card_feas_region);
-ecdf_d1_poly = zeros(1, card_feas_region);
-ecdf_d2 = zeros(1, card_feas_region);
-ecdf_d2_poly = zeros(1, card_feas_region);
-ecdf_dinf = zeros(1, card_feas_region);
-ecdf_dinf_poly = zeros(1, card_feas_region);
+plot_sample_size_ecdfs(all_S_indicators, string_names, colors)
 
-for j = 1:card_feas_region
-    ecdf_d1(j) = mean(subsize_d1 <= j);
-    ecdf_d1_poly(j) = mean(subsize_d1_poly <= j);
-    ecdf_d2(j) = mean(subsize_d2 <= j);
-    ecdf_d2_poly(j) = mean(subsize_d2_poly <= j);
-    ecdf_dinf(j) = mean(subsize_dinf <= j);
-    ecdf_dinf_poly(j) = mean(subsize_dinf_poly <= j);
-end
-
-figure
-hold on
-
-plot([1:card_feas_region], ecdf_d1, 'b-', 'LineWidth', 2);
-plot([1:card_feas_region], ecdf_d1_poly, 'b:','LineWidth', 2);
-plot([1:card_feas_region], ecdf_d2, 'r-', 'LineWidth', 2);
-plot([1:card_feas_region], ecdf_d2_poly, 'r:', 'LineWidth', 2);
-plot([1:card_feas_region], ecdf_dinf, 'g-', 'LineWidth', 2);
-plot([1:card_feas_region], ecdf_dinf_poly, 'g:', 'LineWidth', 2);
-
-xlabel('Subset Size ($s$)', 'Interpreter', 'latex')
-ylabel('P($|S| \leq s$)', 'Interpreter', 'latex')
-leg1 = legend('$d^1$ standard', '$d^1$ relaxed', '$d^2$ standard', '$d^2$ relaxed', '$d^{\infty}$ standard', '$d^{\infty}$ relaxed', 'location', 'southeast');
-legend boxoff
-set(leg1,'Interpreter','latex');
-set(gca, 'FontSize', 14, 'LineWidth', 2)
-set(gcf,'units','inches','position',[1,1,9,4.5])
-
-hold off
+%% END
 
 add_rm_paths('remove');
