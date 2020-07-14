@@ -16,10 +16,10 @@ yyaxis left
 C = sum(S_indicators,2)'/size(S_indicators,2);
 %scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
 plot(feas_region(:,1), C, 'g:', 'LineWidth', 2)
-plot(exp_set(:,1),zeros(1,size(exp_set,2)),'bx','markerfacecolor','b', 'MarkerSize', 12, 'LineWidth', 2)
+plot(exp_set(:,1),zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 2)
 line([min(feas_region), max(feas_region)], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', '-', 'LineWidth', 2)
 yyaxis right
-plot(feas_region(:,1),true_mean,'k--', 'LineWidth',2)
+plot(feas_region(:,1),true_mean,'b--', 'LineWidth',2)
 plt = gca;
 plt.YAxis(1).Color = 'k';
 plt.YAxis(2).Color = 'k';
