@@ -17,21 +17,21 @@ D_x0s = Inf*ones(card_feas_region, 1);
 zs = zeros(card_feas_region, 1);
 
 for l = 1:card_feas_region
-    
+        
     x0 = feas_region(l,:);
     
     % Setup optimization problem
     [A, C, b] = PO_info_handle(x0, exp_set, prop_params);
-    
+
     % Calculate minimum standardized discrepancy of solution x0
     D_x0s(l) = calc_min_std_discrep(discrep_string, A, C, b, sample_mean, sample_var, n_vec, LP_solver_string);
-    
+
     % Classify solution x0 via plausible optima approach
     S_indicators(l) = (D_x0s(l) <= D_cutoff);
-    
+
     % Solve linear program to check feasibility
     zs(l) = check_poly_feas(discrep_string, A, C, b, sample_mean, sample_var, n_vec, D_cutoff, LP_solver_string);
-    
+
     % Classify solution x0 via relaxation
     S_poly_indicators(l) = (zs(l) >= 0); 
         
