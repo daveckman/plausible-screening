@@ -21,9 +21,12 @@ RandStream.setGlobalStream(service_stream);
 % HARD CODED FOR 5-MACHINE PROBLEM WITH BUDGET OF 50 RESOURCES
 
 % Unpack configuration of machines' mean cycle times to evaluate
-budget = 50; % number of resources to allocate across machines
-mean_cycle_times = [solution, budget - sum(solution)];
-% sum of machine cycle times = budget
+budget = 50; % total number of resources to allocate across machines
+allocation = [solution, budget - sum(solution)];
+lambda = [3, 5, 2, 5, 1]; % per-resource processing rate of each machine
+mean_cycle_times = 1./(lambda.*(1 + allocation));
+% theta_i = 1/(lambda_i*(1 + x_i)) % the 1 avoids division by zero if no
+% resources allocated to a machine
 
 % Initialize for storage
 outputs  = zeros(1,n_reps);

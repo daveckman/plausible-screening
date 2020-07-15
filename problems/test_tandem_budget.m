@@ -45,9 +45,9 @@ feas_region = exp_set;
 
 k = size(exp_set, 1);
 
-n_vec = 10*ones(k, 1); % col vector
+n_vec = 100*ones(k, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha
-discrep_string = 'ell1'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
+discrep_string = 'ellinf'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
 fn_props = 'convex'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = []; % gamma for Lipschitz constant
 LP_solver_string = 'glpk'; % {'MATLAB', 'glpk'}
