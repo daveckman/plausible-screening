@@ -74,7 +74,7 @@ else % Formulate and solve a linear program (via Farkas' lemma)
             [~, z, exit_flag] = glpk(f_LP, [A_LP; Aeq_LP], [b_LP; beq_LP], -Inf*ones(size(A_LP,2),1), Inf*ones(size(A_LP,2),1), [repmat('U',size(A_LP,1),1); repmat('S',size(Aeq_LP,1),1)], repmat('C',size(A_LP,2),1), 1, struct('savefilename','SimpleLP'));
             
             %Check if linear program was unbounded.
-            if exit_flag == 6
+            if exit_flag == 6 || exit_flag == 111
                 z = -Inf;
             end
     end
