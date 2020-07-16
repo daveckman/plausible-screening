@@ -21,24 +21,35 @@ for i1 = 0:budget
     end
 end
 
+% MULTICHOOSE CONSTRUCTION OF EXP_SET
+
 % For evaluated solutions, allocate budget = 50 across machines in
 % multiples of 10 units
 frac_budget = 5;
 multiple = 10;
 % # evaluated solutions = (5 multichoose 5) = 126 = .04% of feas solns
 
-exp_set = zeros(nchoosek(num_machines + frac_budget - 1, frac_budget),4);
-row = 1;
-for i1 = 0:frac_budget
-    for i2 = 0:(frac_budget - i1)
-        for i3 = 0:(frac_budget - i1 - i2)
-            for i4 = 0:(frac_budget - i1 - i2 - i3)
-                exp_set(row,:) = multiple*[i1, i2, i3, i4];
-                row = row + 1;
-            end
-        end
-    end
-end
+% exp_set = zeros(nchoosek(num_machines + frac_budget - 1, frac_budget),4);
+% row = 1;
+% for i1 = 0:frac_budget
+%     for i2 = 0:(frac_budget - i1)
+%         for i3 = 0:(frac_budget - i1 - i2)
+%             for i4 = 0:(frac_budget - i1 - i2 - i3)
+%                 exp_set(row,:) = multiple*[i1, i2, i3, i4];
+%                 row = row + 1;
+%             end
+%         end
+%     end
+% end
+
+% K-MEANS CONSTRUCTION OF EXP_SET
+% kmeans_rng = RandStream.create('mlfg6331_64');
+% opts = statset('Streams',kmeans_rng,'UseSubstreams',1);
+% [IDX, C] = kmeans(feas_region,125,'Options',opts);
+% exp_set = round(C);
+% scatter(C(:,1) + C(:,2)*cos(pi/3), C(:,2)*sin(pi/3))
+
+load('tandem_budget_exp_set.mat','exp_set');
 
 % !!! for faster run time
 feas_region = exp_set;

@@ -17,7 +17,7 @@ D_x0s = Inf*ones(card_feas_region, 1);
 zs = zeros(card_feas_region, 1);
 
 for l = 1:card_feas_region
-    %fprintf('Solution %d.\n', l)
+    fprintf('Solution %d.\n', l)
     x0 = feas_region(l,:);
     
     % Setup optimization problem
