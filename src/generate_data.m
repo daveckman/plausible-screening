@@ -1,4 +1,4 @@
-function [sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, discrep_string)
+function [sample_mean, sample_var, sample_pair_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, discrep_string)
 % Generate data from solutions in the experiment set.
 % Take n_i replications at solution x_i for i = 1, ... k where k is the
 % cardinality of the experimental set X.
@@ -37,9 +37,21 @@ if strcmp(discrep_string, 'CRN') == 1
         outputs(i,:) = oracle_handle(oracle_rngs, x_i, n_i);
         
     end % end for
+    
     % Calculate summary statistics
     sample_mean = mean(outputs,2);
     sample_var = cov(outputs');
+    
+    % !! TO AVOID SINGULARITIES !!
+    sample_var = sample_var + 1e-6*eye(k);
+    
+    % Calculate pairwise difference variances (for ESTB with CRN)
+    sample_pair_var = zeros(k, k);
+    for j = 1:k
+        for l = 1:k
+            sample_pair_var(j, l) = 1/(n_vec(1) - 1)*sum((outputs(j,:) - outputs(l,:) - (sample_mean(j) - sample_mean(l))).^2);
+        end
+    end
     
 else % otherwise do independent sampling
     
@@ -67,6 +79,8 @@ else % otherwise do independent sampling
         sample_var(i) = var(outputs);
                 
     end % end for
+    
+    sample_pair_var = [];
     
 end % end if
 

@@ -8,7 +8,7 @@ num_machines = 5;
 
 % # feasible solutions = (5 multichoose 50) = 316,251
 % Because of tight budget constraint (equality), reduce the dim to d = 4.
-feas_region = zeros(nchoosek(num_machines + budget -1, budget), num_machines - 1);
+feas_region = zeros(nchoosek(num_machines + budget - 1, budget), num_machines - 1);
 row = 1;
 for i1 = 0:budget
     for i2 = 0:(budget - i1)
@@ -50,4 +50,4 @@ alpha = 0.05; % Confidence level = 1-alpha
 discrep_string = 'ellinf'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
 fn_props = 'convex'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = []; % gamma for Lipschitz constant
-LP_solver_string = 'glpk'; % {'MATLAB', 'glpk'}
+LP_solver_string = 'MATLAB'; % {'MATLAB', 'glpk'}
