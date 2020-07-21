@@ -1,7 +1,7 @@
 function add_rm_paths(add_rm_flag)
 % Add or remove necessary folders to the MATLAB path
 
-folders = strcat({'../'}, {'data','plots','problems','scripts','src','tools'});
+folders = strcat({'../'}, {'problems','src','tools'});
 
 switch add_rm_flag
     case 'add'

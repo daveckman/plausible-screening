@@ -31,7 +31,7 @@ all_S_indicators_dinf = zeros(card_feas_region, macroreps, length(K_list));
 
 % Read data into matrix
 for i = 1:length(K_list)
-    load(['ctsnews_N=400_K=',num2str(K_list(i)),'_iid_lipschitz.mat'],myVars{:});
+    load(['ctsnews_N=400_K=',num2str(K_list(i)),'_iid_convex.mat'],myVars{:});
     all_SS_indicators(:,:,i) = SS_indicators;
     all_S_indicators_d1(:,:,i) = S_indicators_d1;
     all_S_indicators_d2(:,:,i) = S_indicators_d2;
@@ -86,10 +86,12 @@ opt_gaps_S_d2 = all_S_indicators_d2.*repmat_opt_gap;
 opt_gaps_S_dinf = all_S_indicators_dinf.*repmat_opt_gap;
 
 % Compute (screening) power -> average optimality gap
-power_SS  = reshape(mean(sum(opt_gaps_SS, 1)./subset_size_SS,2), [1, length(K_list)]);
-power_S_d1 = reshape(mean(sum(opt_gaps_S_d1, 1)./subset_size_S_d1,2), [1, length(K_list)]);
-power_S_d2 = reshape(mean(sum(opt_gaps_S_d2, 1)./subset_size_S_d2,2), [1, length(K_list)]);
-power_S_dinf = reshape(mean(sum(opt_gaps_S_dinf, 1)./subset_size_S_dinf,2), [1, length(K_list)]);
+% Avoid division by zero when subset size = 0
+ss_eps = 0.000001;
+power_SS  = reshape(mean(sum(opt_gaps_SS, 1)./(subset_size_SS+eps),2), [1, length(K_list)]);
+power_S_d1 = reshape(mean(sum(opt_gaps_S_d1, 1)./(subset_size_S_d1+eps),2), [1, length(K_list)]);
+power_S_d2 = reshape(mean(sum(opt_gaps_S_d2, 1)./(subset_size_S_d2+eps),2), [1, length(K_list)]);
+power_S_dinf = reshape(mean(sum(opt_gaps_S_dinf, 1)./(subset_size_S_dinf+eps),2), [1, length(K_list)]);
 
 % Compute coverage
 coverage_SS = inc_probs_SS(opt_index,:);
