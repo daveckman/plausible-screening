@@ -1,6 +1,31 @@
 clear
 clc;
 
+
+fn_property = 'lipschitz_proj'; % 'convex' or 'lipschitz_proj'
+
+if strcmp(fn_property, 'lipschitz_proj') == 1
+    plt_title = 'Lipschitz';
+elseif strcmp(fn_property, 'convex') == 1
+    plt_title = 'Convex';
+end
+
+setup = 'fixedK'; % 'fixedK' or 'fixedN'
+
+if strcmp(setup, 'fixedN') == 1
+    N_list = [400, 400, 400, 400];
+    K_list = [5, 10, 20, 50];
+    x_axis_limits = [min(K_list), max(K_list)];
+    x_axis_pts = K_list;
+    x_axis_label = 'Cardinality of Experimental Set ($k$)';
+elseif strcmp(setup, 'fixedK') == 1
+    N_list = [400, 600, 1000, 2000, 4000];
+    K_list = [5, 5, 5, 5, 5];
+    x_axis_limits = [min(N_list), max(N_list)];
+    x_axis_pts = N_list;
+    x_axis_label = 'Total Sample Size';
+end
+
 %% Test plotting for each experiment
 % 
 % K_list = [5, 10, 20, 50];
@@ -17,8 +42,6 @@ clc;
 % end
 
 %% Experiments for fixed N (total number of replications)
-N = 400;
-K_list = [5, 10, 20, 50];
 myVars = {'SS_indicators', 'S_indicators_d1', 'S_indicators_d2', 'S_indicators_dinf'};
 
 % Initialize
@@ -31,7 +54,7 @@ all_S_indicators_dinf = zeros(card_feas_region, macroreps, length(K_list));
 
 % Read data into matrix
 for i = 1:length(K_list)
-    load(['ctsnews_N=400_K=',num2str(K_list(i)),'_iid_convex.mat'],myVars{:});
+    load(['ctsnews_N=',num2str(N_list(i)),'_K=',num2str(K_list(i)),'_iid_',fn_property,'.mat'],myVars{:});
     all_SS_indicators(:,:,i) = SS_indicators;
     all_S_indicators_d1(:,:,i) = S_indicators_d1;
     all_S_indicators_d2(:,:,i) = S_indicators_d2;
@@ -77,7 +100,7 @@ end
 [opt_val, opt_index] = min(true_mean);
 
 opt_gap = true_mean - opt_val;
-repmat_opt_gap = repmat(opt_gap', [1, macroreps, 4]);
+repmat_opt_gap = repmat(opt_gap', [1, macroreps, length(K_list)]);
 
 % Compute optimality gaps
 opt_gaps_SS = all_SS_indicators.*repmat_opt_gap;
@@ -111,54 +134,169 @@ rgb_purple = [0.4940, 0.1840, 0.5560];
 
 figure
 set(gca, 'FontSize', 14, 'LineWidth', 2)
-xlim([min(K_list), max(K_list)])
+xlim(x_axis_limits)
 %ylim([0,200])
-xlabel('Cardinality of Experimental Set ($k$)','interpreter','latex')
+xlabel(x_axis_label,'interpreter','latex')
 ylabel('Average Subset Size ($|S|$)','interpreter','latex')
-title('Lipschitz')
+title(plt_title)
 hold on
-plot(K_list, avg_subset_size_SS, 'o-', 'markerfacecolor', rgb_blue, 'MarkerSize', 6, 'LineWidth', 1.5);
-plot(K_list, avg_subset_size_S_d1, '^-', 'markerfacecolor', rgb_red, 'MarkerSize', 6, 'LineWidth', 1.5);
-plot(K_list, avg_subset_size_S_d2, 's-', 'markerfacecolor', rgb_yellow, 'MarkerSize', 6, 'LineWidth', 1.5);
-plot(K_list, avg_subset_size_S_dinf, 'p-', 'markerfacecolor', rgb_purple, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, avg_subset_size_SS, 'o-', 'markerfacecolor', rgb_blue, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, avg_subset_size_S_d1, '^-', 'markerfacecolor', rgb_red, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, avg_subset_size_S_d2, 's-', 'markerfacecolor', rgb_yellow, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, avg_subset_size_S_dinf, 'p-', 'markerfacecolor', rgb_purple, 'MarkerSize', 6, 'LineWidth', 1.5);
 legend(string_names, 'location', 'southeast', 'Interpreter', 'latex');
 legend boxoff
 hold off
 
+%x_axis_limits = [min(K_list), max(K_list)];
+    %x_axis_pts = K_list;
+    %x_axis_label 
 %% Plot power
 
 figure
 set(gca, 'FontSize', 14, 'LineWidth', 2)
-xlim([min(K_list), max(K_list)])
+xlim(x_axis_limits)
 %ylim([0,200])
-xlabel('Cardinality of Experimental Set ($k$)','interpreter','latex')
+xlabel(x_axis_label,'interpreter','latex')
 ylabel('Average Average Optimality Gap','interpreter','latex')
-title('Lipschitz')
+title(plt_title)
 hold on
-plot(K_list, power_SS, 'o-', 'markerfacecolor', rgb_blue, 'MarkerSize', 6, 'LineWidth', 1.5);
-plot(K_list, power_S_d1, '^-', 'markerfacecolor', rgb_red, 'MarkerSize', 6, 'LineWidth', 1.5);
-plot(K_list, power_S_d2, 's-', 'markerfacecolor', rgb_yellow, 'MarkerSize', 6, 'LineWidth', 1.5);
-plot(K_list, power_S_dinf, 'p-', 'markerfacecolor', rgb_purple, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, power_SS, 'o-', 'markerfacecolor', rgb_blue, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, power_S_d1, '^-', 'markerfacecolor', rgb_red, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, power_S_d2, 's-', 'markerfacecolor', rgb_yellow, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, power_S_dinf, 'p-', 'markerfacecolor', rgb_purple, 'MarkerSize', 6, 'LineWidth', 1.5);
 legend(string_names, 'location', 'southeast', 'Interpreter', 'latex');
 legend boxoff
 hold off
 
-%% Plot coverage vs power
+%% Plot coverage
 
 figure
 set(gca, 'FontSize', 14, 'LineWidth', 2)
-xlim([min(K_list), max(K_list)])
+xlim(x_axis_limits)
 ylim([0,1])
-xlabel('Cardinality of Experimental Set ($k$)','interpreter','latex')
+xlabel(x_axis_label,'interpreter','latex')
 ylabel('Coverage ($P(x^* \in S)$)','interpreter','latex')
-title('Lipschitz')
+title(plt_title)
 hold on
-plot(K_list, coverage_SS, 'o-', 'markerfacecolor', rgb_blue, 'MarkerSize', 6, 'LineWidth', 1.5);
-plot(K_list, coverage_S_d1, '^-', 'markerfacecolor', rgb_red, 'MarkerSize', 6, 'LineWidth', 1.5);
-plot(K_list, coverage_S_d2, 's-', 'markerfacecolor', rgb_yellow, 'MarkerSize', 6, 'LineWidth', 1.5);
-plot(K_list, coverage_S_dinf, 'p-', 'markerfacecolor', rgb_purple, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, coverage_SS, 'o-', 'markerfacecolor', rgb_blue, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, coverage_S_d1, '^-', 'markerfacecolor', rgb_red, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, coverage_S_d2, 's-', 'markerfacecolor', rgb_yellow, 'MarkerSize', 6, 'LineWidth', 1.5);
+plot(x_axis_pts, coverage_S_dinf, 'p-', 'markerfacecolor', rgb_purple, 'MarkerSize', 6, 'LineWidth', 1.5);
 legend(string_names, 'location', 'southeast', 'Interpreter', 'latex');
 legend boxoff
 hold off
 
 %% Plot 1-D P(x0 in S)
+
+K = 5;
+N = 400;
+M = 1;
+alpha = 0.05;
+
+load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_iid_',fn_property,'.mat'],'exp_set');
+
+grey_rgb = (192/256)*ones(1,3);
+
+figure
+set(gca, 'FontSize', 14, 'LineWidth', 2)
+
+%
+subplot(1,4,1)
+
+axis square
+xlim([0,200])
+ylim([0,1])
+xlabel('Solution ($x$)','interpreter','latex')
+ylabel('$P(x_0 \in S)$','interpreter','latex')
+title(string_names{1},'interpreter','latex')
+
+hold on
+yyaxis left
+C = sum(all_SS_indicators(:,:,1),2)'/200;
+%scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+plot(feas_region(:,1), C, 'b-', 'LineWidth', 2)
+line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+yyaxis right
+plot([1:200],true_mean, 'color', grey_rgb, 'LineWidth',1)
+plt = gca;
+plt.YAxis(1).Color = 'k';
+plt.YAxis(2).Color = 'k';
+set(gca,'ytick',[]);
+set(gca,'ycolor',[1 1 1])
+hold off
+
+%
+subplot(1,4,2)
+
+axis square
+xlim([0,200])
+ylim([0,1])
+xlabel('Solution ($x$)','interpreter','latex')
+title(string_names{2},'interpreter','latex')
+
+hold on
+yyaxis left
+C = sum(all_S_indicators_d1(:,:,1),2)'/200;
+%scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+plot(feas_region(:,1), C, 'b-', 'LineWidth', 2)
+plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 8, 'LineWidth', 1)
+line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+yyaxis right
+plot([1:200],true_mean, 'color', grey_rgb, 'LineWidth',1)
+plt = gca;
+plt.YAxis(1).Color = 'k';
+plt.YAxis(2).Color = 'k';
+set(gca,'ytick',[]);
+set(gca,'ycolor',[1 1 1])
+hold off
+
+%
+subplot(1,4,3)
+
+axis square
+xlim([0,200])
+ylim([0,1])
+xlabel('Solution ($x$)','interpreter','latex')
+title(string_names{3},'interpreter','latex')
+
+hold on
+yyaxis left
+C = sum(all_S_indicators_d2(:,:,1),2)'/200;
+%scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+plot(feas_region(:,1), C, 'b-', 'LineWidth', 2)
+plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 8, 'LineWidth', 1)
+line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+yyaxis right
+plot([1:200],true_mean, 'color', grey_rgb, 'LineWidth',1)
+plt = gca;
+plt.YAxis(1).Color = 'k';
+plt.YAxis(2).Color = 'k';
+set(gca,'ytick',[]);
+set(gca,'ycolor',[1 1 1])
+hold off
+
+%
+subplot(1,4,4)
+
+axis square
+xlim([0,200])
+ylim([0,1])
+xlabel('Solution ($x$)','interpreter','latex')
+title(string_names{4},'interpreter','latex')
+
+hold on
+yyaxis left
+C = sum(all_S_indicators_dinf(:,:,1),2)'/200;
+%scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+plot(feas_region(:,1), C, 'b-', 'LineWidth', 2)
+plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 8, 'LineWidth', 1)
+line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+yyaxis right
+plot([1:200],true_mean, 'color', grey_rgb, 'LineWidth',1)
+plt = gca;
+plt.YAxis(1).Color = 'k';
+plt.YAxis(2).Color = 'k';
+set(gca,'ytick',[]);
+set(gca,'ycolor',[1 1 1])
+hold off

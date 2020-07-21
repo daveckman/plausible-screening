@@ -8,7 +8,7 @@
 
 #$ -pe smp 4
 
-#$ -l h_vmem=8g
+#$ -l h_vmem=400g
 
 #$ -l h_rt=24:00:00
 

@@ -23,7 +23,7 @@ for l = 1:card_feas_region
             if strcmp(discrep_string, 'CRN') == 1 % CRN
                 W_lj = t_quantile*sqrt(sample_pair_var(l,j)/n_vec(1));
             else % i.i.d. sampling
-                W_lj = sqrt(t_quantiles(l)*sample_var(l)/n_vec(l) + t_quantiles(j)*sample_var(j)/n_vec(j));
+                W_lj = sqrt(t_quantiles(l)^2*sample_var(l)/n_vec(l) + t_quantiles(j)^2*sample_var(j)/n_vec(j));
             end
             
             if sample_mean(l) >= sample_mean(j) + W_lj
