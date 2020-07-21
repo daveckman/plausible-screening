@@ -7,7 +7,7 @@ fprintf('K = %d and N = %d.\n',K,N)
 
 add_rm_paths('add');
 
-%crunch_cluster = parcluster;
+crunch_cluster = parcluster;
 %pool_obj = parpool(crunch_cluster);
 maxNumCompThreads(4);
 %addAttachedFiles(pool_obj, {'glpk.m', 'glpkcc.mexw64'})
@@ -26,7 +26,7 @@ exp_set = round((1:K)'*(200/K) - (200/(2*K)));
 n_vec = (N/K)*ones(K, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha
 discrep_string = 'ell1'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
-fn_props = 'lipschitz'; % {'convex', 'lipschitz', 'lipschitz_proj}
+fn_props = 'convex'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = 7; % gamma for Lipschitz constant % = max(sell_price - cost, cost - salvage)
 LP_solver_string = 'MATLAB'; % {'MATLAB', 'glpk'}
 
@@ -62,7 +62,7 @@ SS_indicators = zeros(card_feas_region, M);
 
 print_problem_header(problem_string, feas_region, exp_set, fn_props)
 
-parfor m = 1:M
+parfor (m = 1:M, crunch_cluster)
 
     % Generate data using i.i.d. sampling and calculate summary statistics
     [sample_mean, sample_var, ~] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
@@ -90,5 +90,5 @@ parfor m = 1:M
 end
 
 save(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_iid_',fn_props,'.mat'])    
- 
+
 add_rm_paths('remove');
