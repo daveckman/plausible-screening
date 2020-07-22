@@ -37,3 +37,6 @@ Aeq_LP = C';
 beq_LP = zeros(q,1);
 
 [~, z, exit_flag] = linprog(f_LP, A_LP, b_LP, Aeq_LP, beq_LP, [], [], []);
+R = rref(Aeq_LP);
+[~, z, exit_flag] = linprog(f_LP, A_LP, b_LP, R(1:end-1,:), beq_LP(1:end-1), [], [], []);
+
