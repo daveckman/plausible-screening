@@ -43,7 +43,7 @@ if strcmp(discrep_string, 'CRN') == 1
     sample_var = cov(outputs');
     
     % !! TO AVOID SINGULARITIES !!
-    sample_var = sample_var + 1e-6*eye(k);
+    %sample_var = sample_var + 1e-6*eye(k);
     
     % Calculate pairwise difference variances (for ESTB with CRN)
     sample_pair_var = zeros(k, k);

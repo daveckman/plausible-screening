@@ -134,14 +134,33 @@ switch discrep_string
             
         % Optimization problem
         % D(x_0) = min_{(m, w) in P} n*(muhat - m)'*Sigma^{-1}*(muhat - m)
+         
+%         % Formulate as quadratic program
+%         H_QP = [2*n_vec(1)*inv(sample_var(~zero_var_solns,~zero_var_solns)), zeros(k_bar,q); zeros(q,k_bar), zeros(q,q)];
+%         f_QP = [-2*n_vec(1)*(sample_mean(~zero_var_solns)'/sample_var(~zero_var_solns,~zero_var_solns))'; zeros(q,1)];
+%         A_QP = [A, C];
+%         b_QP = b;
+%         opt_val_offset = n_vec(1)*sample_mean(~zero_var_solns)'*(sample_var(~zero_var_solns,~zero_var_solns)\sample_mean(~zero_var_solns));
         
-        % Formulate as quadratic program
-        H_QP = [2*n_vec(1)*inv(sample_var(~zero_var_solns,~zero_var_solns)), zeros(k_bar,q); zeros(q,k_bar), zeros(q,q)];
-        f_QP = [-2*n_vec(1)*(sample_mean(~zero_var_solns)'/sample_var(~zero_var_solns,~zero_var_solns))'; zeros(q,1)];
-        A_QP = [A, C];
+        % Eigenvalue decomposition
+        [V, D] = eig(sample_var);
+        num_zeros = sum(diag(D) < 1e-6);
+        Htilde = V(:,1 + num_zeros:end)*sqrt(D(1 + num_zeros:end, 1 + num_zeros:end));
+        H_QP = [eye(k-num_zeros), zeros(k-num_zeros,q); zeros(q,k-num_zeros), zeros(q,q)];
+        f_QP = [-sqrt(2*n_vec(1))*((sample_mean)'*pinv(Htilde'))'; zeros(q, 1)];
+        A_QP = 1/(sqrt(2*n_vec(1)))*[A, C]*Htilde;
         b_QP = b;
-        opt_val_offset = n_vec(1)*sample_mean(~zero_var_solns)'*(sample_var(~zero_var_solns,~zero_var_solns)\sample_mean(~zero_var_solns));
+        opt_val_offset = n_vec(1)*sample_mean'*pinv(Htilde')*pinv(Htilde)*sample_mean;
         
+        
+%         % Schur decomposition approach
+%         [U, T] = schur(sample_var);
+%         H_QP = [2*n_vec(1)*inv(T), zeros(k,q); zeros(q,k), zeros(q,q)];
+%         f_QP = [-2*n_vec(1)*(sample_mean'*inv(U')*inv(T))'; zeros(q,1)];
+%         A_QP = [A, C]*U;
+%         b_QP = b;
+%         opt_val_offset = n_vec(1)*sample_mean'*inv(U')*inv(T)*inv(U)*sample_mean;
+%         
 %         % Moore-Penrose pseudoinverse        
 %         % Formulate as quadratic program
 %         H_QP = [2*n_vec(1)*pinv(sample_var(~zero_var_solns,~zero_var_solns)), zeros(k_bar,q); zeros(q,k_bar), zeros(q,q)];
