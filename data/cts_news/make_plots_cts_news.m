@@ -1,8 +1,8 @@
 clear
 clc;
 
-
-fn_property = 'lipschitz_proj'; % 'convex' or 'lipschitz_proj'
+fn_property = 'convex';
+%fn_property = 'lipschitz_proj'; % 'convex' or 'lipschitz_proj'
 
 if strcmp(fn_property, 'lipschitz_proj') == 1
     plt_title = 'Lipschitz';
@@ -10,7 +10,7 @@ elseif strcmp(fn_property, 'convex') == 1
     plt_title = 'Convex';
 end
 
-setup = 'fixedK'; % 'fixedK' or 'fixedN'
+setup = 'fixedN'; % 'fixedK' or 'fixedN'
 
 if strcmp(setup, 'fixedN') == 1
     N_list = [400, 400, 400, 400];
@@ -138,15 +138,17 @@ xlim(x_axis_limits)
 ylim([0,200])
 xlabel(x_axis_label,'interpreter','latex')
 ylabel('Average Subset Size ($|S|$)','interpreter','latex')
-title(plt_title)
+%title(plt_title)
 hold on
 plot(x_axis_pts, avg_subset_size_SS, 'o-', 'markerfacecolor', rgb_blue, 'MarkerSize', 6, 'LineWidth', 1.5);
 plot(x_axis_pts, avg_subset_size_S_d1, '^-', 'markerfacecolor', rgb_red, 'MarkerSize', 6, 'LineWidth', 1.5);
 plot(x_axis_pts, avg_subset_size_S_d2, 's-', 'markerfacecolor', rgb_yellow, 'MarkerSize', 6, 'LineWidth', 1.5);
 plot(x_axis_pts, avg_subset_size_S_dinf, 'p-', 'markerfacecolor', rgb_purple, 'MarkerSize', 6, 'LineWidth', 1.5);
-legend(string_names, 'location', 'northeast', 'Interpreter', 'latex');
+legend(string_names, 'location', 'southeast', 'Interpreter', 'latex');
 legend boxoff
 hold off
+
+print(['avg_ss_fixedN_ctsnews_',fn_property],'-dpng','-r500')
 
 %x_axis_limits = [min(K_list), max(K_list)];
     %x_axis_pts = K_list;
@@ -186,6 +188,65 @@ plot(x_axis_pts, coverage_S_dinf, 'p-', 'markerfacecolor', rgb_purple, 'MarkerSi
 legend(string_names, 'location', 'southeast', 'Interpreter', 'latex');
 legend boxoff
 hold off
+
+%% Plot single 1-D P(x0 in S) for d2
+
+K = 5;
+N = 400;
+M = 1;
+alpha = 0.05;
+load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_iid_',fn_property,'.mat'],'exp_set');
+
+grey_rgb = (192/256)*ones(1,3);
+figure
+set(gca, 'FontSize', 14, 'LineWidth', 2)
+
+xlim([0,200])
+ylim([0,1])
+xlabel('Solution ($x$)','interpreter','latex')
+ylabel('$P(x_0 \in S)$','interpreter','latex')
+%title(string_names{1},'interpreter','latex')
+
+% hold on
+% C = sum(all_S_indicators_d2(:,:,1),2)'/200;
+% [ax, h1, h2] = plotyy(feas_region(:,1), C, [1:200],true_mean);
+% set(h1, 'color', 'blue', 'LineWidth', 2)
+% set(h2, 'color', grey_rgb, 'LineWidth',1)
+% scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+% myline = plot(feas_region(:,1), C, 'b-', 'LineWidth', 2);
+% plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
+% line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+% plot([1:200],true_mean, 'color', grey_rgb, 'LineWidth',1)
+% uistack(ax(1), 'top')
+% plt = gca;
+% set(ax(1), 'color', 'k');
+% plt.YAxis(1).Color = 'k';
+% plt.YAxis(2).Color = 'k';
+% ax(2).Color='None';
+% set(gca,'ytick',[]);
+% set(gca,'ycolor',[1 1 1])
+% box off
+% % hold off
+
+
+hold on
+yyaxis left
+C = sum(all_S_indicators_d2(:,:,1),2)'/200;
+%scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+plot(feas_region(:,1), C, 'b-', 'LineWidth', 2);
+plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
+line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+yyaxis right
+plot([1:200],true_mean, 'color', grey_rgb, 'LineWidth',1)
+%uistack(myticks, 'top')
+plt = gca;
+plt.YAxis(1).Color = 'k';
+plt.YAxis(2).Color = 'k';
+set(gca,'ytick',[]);
+set(gca,'ycolor',[1 1 1])
+hold off
+
+print(['inc_probs_ctsnews_',fn_property,'_K=5_N=400'],'-dpng','-r500')
 
 %% Plot 1-D P(x0 in S)
 
@@ -301,79 +362,82 @@ set(gca,'ytick',[]);
 set(gca,'ycolor',[1 1 1])
 hold off
 
-% %% Make CRN plots
-% myVars = {'SS_indicators_CRN', 'S_indicators_dcrn'};
-% load(['ctsnews_N=4000_K=5_crn_lipschitz_proj.mat'],myVars{:});
-% 
-% % Compute P(x0 in S)
-% inc_probs_SS_CRN = mean(SS_indicators_CRN,2);
-% inc_probs_S_dcrn = mean(S_indicators_dcrn,2);
-% 
-% % Compute subset sizes
-% subset_size_SS_CRN = sum(SS_indicators_CRN,1);
-% subset_size_S_dcrn = sum(S_indicators_dcrn,1);
-% 
-% % Compute average subset sizes
-% avg_subset_size_SS_CRN = mean(subset_size_SS_CRN,2);
-% avg_subset_size_S_dcrn = mean(subset_size_S_dcrn,2);
-% 
-% cost = 3; % per unit order cost 
-% sell_price = 9; % per unit sale revenue
-% salvage = 1; % per unit salvage revenue
-% shortage = 1; % per unit shortage cost
-% wbl_scale = 50;
-% wbl_shape = 2; 
-% 
-% feas_region = [1:200]';
-% true_mean = zeros(1,length(feas_region));
-% neg_profit = @(D,Q) (cost*Q + shortage*(D - min(D,Q)) - sell_price*min(D,Q) - salvage*(Q - min(D,Q)));
-% for i = 1:length(true_mean)
-%     Q = feas_region(i);
-%     true_mean(i) = integral(@(D) neg_profit(D, Q).*wblpdf(D, wbl_scale, wbl_shape), 0, Inf);
-% end
-% [opt_val, opt_index] = min(true_mean);
-% 
-% string_names = {'STB w/ CRN', 'PO: $d^\mathrm{CRN}$'};
-% 
-% K = 5;
-% N = 400;
-% M = 1;
-% alpha = 0.05;
-% 
-% load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_crn_lipschitz_proj.mat'],'exp_set');
-% 
-% grey_rgb = (192/256)*ones(1,3);
-% 
+%% Make CRN plots
+myVars = {'SS_indicators_CRN', 'S_indicators_dcrn'};
+load(['ctsnews_N=4000_K=5_crn_lipschitz_proj.mat'],myVars{:});
+
+% Compute P(x0 in S)
+inc_probs_SS_CRN = mean(SS_indicators_CRN,2);
+inc_probs_S_dcrn = mean(S_indicators_dcrn,2);
+
+% Compute subset sizes
+subset_size_SS_CRN = sum(SS_indicators_CRN,1);
+subset_size_S_dcrn = sum(S_indicators_dcrn,1);
+
+% Compute average subset sizes
+avg_subset_size_SS_CRN = mean(subset_size_SS_CRN,2);
+avg_subset_size_S_dcrn = mean(subset_size_S_dcrn,2);
+
+cost = 3; % per unit order cost 
+sell_price = 9; % per unit sale revenue
+salvage = 1; % per unit salvage revenue
+shortage = 1; % per unit shortage cost
+wbl_scale = 50;
+wbl_shape = 2; 
+
+feas_region = [1:200]';
+true_mean = zeros(1,length(feas_region));
+neg_profit = @(D,Q) (cost*Q + shortage*(D - min(D,Q)) - sell_price*min(D,Q) - salvage*(Q - min(D,Q)));
+for i = 1:length(true_mean)
+    Q = feas_region(i);
+    true_mean(i) = integral(@(D) neg_profit(D, Q).*wblpdf(D, wbl_scale, wbl_shape), 0, Inf);
+end
+[opt_val, opt_index] = min(true_mean);
+
+string_names = {'STB w/ CRN', 'PO: $d^\mathrm{CRN}$'};
+
+K = 5;
+N = 400;
+M = 1;
+alpha = 0.05;
+
+load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_crn_lipschitz_proj.mat'],'exp_set');
+
+grey_rgb = (192/256)*ones(1,3);
+
+figure
+set(gca, 'FontSize', 14, 'LineWidth', 2)
+
+%
+
+axis square
+xlim([0,200])
+ylim([0,1])
+xlabel('Solution ($x$)','interpreter','latex')
+ylabel('$P(x_0 \in S)$','interpreter','latex')
+%title(string_names{1},'interpreter','latex')
+
+hold on
+yyaxis left
+C = sum(SS_indicators_CRN,2)'/200;
+%C = sum(S_indicators_dcrn,2)'/200;
+%scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+plot(feas_region(:,1), C, 'b-', 'LineWidth', 2)
+line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+yyaxis right
+plot([1:200],true_mean, 'color', grey_rgb, 'LineWidth',1)
+plt = gca;
+plt.YAxis(1).Color = 'k';
+plt.YAxis(2).Color = 'k';
+set(gca,'ytick',[]);
+set(gca,'ycolor',[1 1 1])
+hold off
+
+print(['inc_probs_ctsnews_lipschitz_crn_STB_K=5_N=4000'],'-dpng','-r500')
+
+
+% %
 % figure
-% set(gca, 'FontSize', 14, 'LineWidth', 2)
-% 
-% %
-% subplot(1,2,1)
-% 
-% axis square
-% xlim([0,200])
-% ylim([0,1])
-% xlabel('Solution ($x$)','interpreter','latex')
-% ylabel('$P(x_0 \in S)$','interpreter','latex')
-% title(string_names{1},'interpreter','latex')
-% 
-% hold on
-% yyaxis left
-% C = sum(SS_indicators_CRN,2)'/200;
-% %scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
-% plot(feas_region(:,1), C, 'b-', 'LineWidth', 2)
-% line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
-% yyaxis right
-% plot([1:200],true_mean, 'color', grey_rgb, 'LineWidth',1)
-% plt = gca;
-% plt.YAxis(1).Color = 'k';
-% plt.YAxis(2).Color = 'k';
-% set(gca,'ytick',[]);
-% set(gca,'ycolor',[1 1 1])
-% hold off
-% 
-% %
-% subplot(1,2,2)
 % 
 % axis square
 % xlim([0,200])
