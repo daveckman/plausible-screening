@@ -1,6 +1,6 @@
-function run_PO_tandem_iid(M)
+function run_PO_tandem_iid(M, discrep_index)
 
-%M = 1
+%M = 1;
 
 %clear;
 clc;
@@ -74,7 +74,8 @@ k = size(exp_set, 1);
 
 n_vec = 100*ones(k, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha
-discrep_string = 'ellinf'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
+discrep_strings = {'ell1','ell2','ellinf'};
+discrep_string = discrep_strings{discrep_index}; % {'ell1', 'ell2', 'ellinf', 'CRN'}
 fn_props = 'convex'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = []; % gamma for Lipschitz constant
 LP_solver_string = 'MATLAB'; % {'MATLAB', 'glpk'}
@@ -85,15 +86,17 @@ card_feas_region = size(feas_region, 1);
 
 %% CALCULATE CUTOFFS FOR PO
 
-D_cutoff_dinf = calc_cutoff(k, n_vec, alpha, 'ellinf');
+D_cutoffs = [calc_cutoff(k, n_vec, alpha, 'ell1'), calc_cutoff(k, n_vec, alpha, 'ell2'), calc_cutoff(k, n_vec, alpha, 'ellinf')];
 
 %% RUN MACROREPLICATIONS
 
-M = 1; % Number of macroreplications
-
 % Initialize data storage
-S_indicators_dinf = zeros(card_feas_region, M);
-S_poly_indicators_dinf = zeros(card_feas_region, M);
+S_indicators = zeros(card_feas_region, M);
+S_poly_indicators = zeros(card_feas_region, M);
+D_x0s = zeros(card_feas_region, M);
+zs = zeros(card_feas_region, M);
+PO_times = zeros(card_feas_region, M);
+PO_relaxed_times = zeros(card_feas_region, M);
 
 print_problem_header(problem_string, feas_region, exp_set, fn_props)
 
@@ -103,14 +106,14 @@ for m = 1:M
     [sample_mean, sample_var, ~] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
     
     % Screening (using d1, d2, and dinf discrepancies)
-    [S_indicators_dinf(:), D_x0s, S_poly_indicators_dinf(:), zs] = parPO_screen(crunch_cluster, feas_region, exp_set, sample_mean, sample_var, n_vec, 'ellinf', D_cutoff_dinf, fn_props, prop_params, LP_solver_string);
-
+    [S_indicators(:,m), D_x0s(:,m), S_poly_indicators(:,m), zs(:,m), PO_times(:,m), PO_relaxed_times(:,m)] = parPO_screen(crunch_cluster, feas_region, exp_set, sample_mean, sample_var, n_vec, discrep_string, D_cutoffs(discrep_index), fn_props, prop_params, LP_solver_string);
+    
     fprintf('\nRunning macrorep %d of %d.\n', m, M)
-    print_screening_results('PO', 'ellinf', S_indicators_dinf(:,m))
-    print_screening_results('PO relaxed', 'ellinf', S_poly_indicators_dinf(:,m))
+    print_screening_results('PO', 'discrep_string', S_indicators(:,m))
+    print_screening_results('PO relaxed', 'discrep_string', S_poly_indicators(:,m))
 
 end
 
-save(['tandem_M=',num2str(M),'_iid_',fn_props,'.mat'])    
+save(['tandem_M=',num2str(M),'_iid_',discrep_string,'_',fn_props,'.mat'])    
 
 add_rm_paths('remove');

@@ -1,0 +1,262 @@
+MATLAB is selecting SOFTWARE OPENGL rendering.
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2020 The MathWorks, Inc.
+              R2020a Update 1 (9.8.0.1359463) 64-bit (glnxa64)
+                               April 9, 2020
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+M = 1.
+
+Results for problem "tandem_budget"
+	# of solutions in feasible region: 		23751
+	# of solutions in experimental set: 	100
+	functional property: 					convex
+__________________________________________________________
+
+Solution 500.
+Solution 600.
+Solution 800.
+Solution 100.
+Solution 200.
+Solution 400.
+Solution 1100.
+Solution 300.
+Solution 1000.
+Solution 700.
+Solution 1200.
+Solution 900.
+Solution 4000.
+Solution 3900.
+Solution 3800.
+Solution 3700.
+Solution 3600.
+Solution 3500.
+Solution 3400.
+Solution 3300.
+Solution 3200.
+Solution 3100.
+Solution 3000.
+Solution 2900.
+Solution 2800.
+Solution 2700.
+Solution 2600.
+Solution 2500.
+Solution 2400.
+Solution 5100.
+Solution 5000.
+Solution 4900.
+Solution 4800.
+Solution 4700.
+Solution 4600.
+Solution 4500.
+Solution 4400.
+Solution 4300.
+Solution 4200.
+Solution 4100.
+Solution 5700.
+Solution 5600.
+Solution 5500.
+Solution 5400.
+Solution 5300.
+Solution 5200.
+Solution 6200.
+Solution 6100.
+Solution 6000.
+Solution 5900.
+Solution 5800.
+Solution 1700.
+Solution 1600.
+Solution 1500.
+Solution 1400.
+Solution 1300.
+Solution 2300.
+Solution 2200.
+Solution 2100.
+Solution 2000.
+Solution 1900.
+Solution 1800.
+Solution 8500.
+Solution 8400.
+Solution 8300.
+Solution 8200.
+Solution 8100.
+Solution 8000.
+Solution 12400.
+Solution 12300.
+Solution 12200.
+Solution 12100.
+Solution 12000.
+Solution 10200.
+Solution 10100.
+Solution 10000.
+Solution 9900.
+Solution 9800.
+Solution 9700.
+Solution 13000.
+Solution 12900.
+Solution 12800.
+Solution 15000.
+Solution 14900.
+Solution 14800.
+Solution 14700.
+Solution 14600.
+Solution 14500.
+Solution 13800.
+Solution 13700.
+Solution 10700.
+Solution 10600.
+Solution 10500.
+Solution 10400.
+Solution 10300.
+Solution 14400.
+Solution 14300.
+Solution 14200.
+Solution 16100.
+Solution 16000.
+Solution 15900.
+Solution 15500.
+Solution 15400.
+Solution 16400.
+Solution 16300.
+Solution 16200.
+Solution 15800.
+Solution 15700.
+Solution 15600.
+Solution 17200.
+Solution 17100.
+Solution 17000.
+Solution 17500.
+Solution 17400.
+Solution 17300.
+Solution 17800.
+Solution 17700.
+Solution 17600.
+Solution 18100.
+Solution 18000.
+Solution 17900.
+Solution 18500.
+Solution 18900.
+Solution 19100.
+Solution 19000.
+Solution 11900.
+Solution 11800.
+Solution 11700.
+Solution 11600.
+Solution 11500.
+Solution 11400.
+Solution 14100.
+Solution 14000.
+Solution 13900.
+Solution 19500.
+Solution 19400.
+Solution 19600.
+Solution 19800.
+Solution 19700.
+Solution 19900.
+Solution 16700.
+Solution 16600.
+Solution 16500.
+Solution 20200.
+Solution 20100.
+Solution 18600.
+Solution 20300.
+Solution 20600.
+Solution 18800.
+Solution 18700.
+Solution 19200.
+Solution 21000.
+Solution 21100.
+Solution 21200.
+Solution 9000.
+Solution 8900.
+Solution 8800.
+Solution 8700.
+Solution 8600.
+Solution 13300.
+Solution 13200.
+Solution 13100.
+Solution 21400.
+Solution 21300.
+Solution 21600.
+Solution 21700.
+Solution 21900.
+Solution 21800.
+Solution 22100.
+Solution 12700.
+Solution 12600.
+Solution 12500.
+Solution 22200.
+Solution 16900.
+Solution 16800.
+Solution 22300.
+Solution 22400.
+Solution 22600.
+Solution 22700.
+Solution 20500.
+Solution 20400.
+Solution 22800.
+Solution 22900.
+Solution 18400.
+Solution 18300.
+Solution 23100.
+Solution 23300.
+Solution 23200.
+Solution 23500.
+Solution 20700.
+Solution 23600.
+Solution 23000.
+Solution 23700.
+Solution 9600.
+Solution 9500.
+Solution 9400.
+Solution 9300.
+Solution 9200.
+Solution 9100.
+Solution 11300.
+Solution 11200.
+Solution 11100.
+Solution 11000.
+Solution 10900.
+Solution 10800.
+Solution 21500.
+Solution 22000.
+Solution 22500.
+Solution 18200.
+Solution 7900.
+Solution 7800.
+Solution 7700.
+Solution 7600.
+Solution 7500.
+Solution 23400.
+Solution 6800.
+Solution 6700.
+Solution 6600.
+Solution 6500.
+Solution 6400.
+Solution 6300.
+Solution 13600.
+Solution 13500.
+Solution 13400.
+Solution 20000.
+Solution 7400.
+Solution 7300.
+Solution 7200.
+Solution 7100.
+Solution 7000.
+Solution 6900.
+Solution 19300.
+Solution 20900.
+Solution 20800.
+Solution 15300.
+Solution 15200.
+Solution 15100.
+
+Running macrorep 1 of 1.
+Screening with PO (ellinf): # solutions in subset = 5166.
+Screening with PO relaxed (ellinf): # solutions in subset = 6772.
+[Warning: Objects of class 'parallel.cluster.Local' cannot be saved to MAT
+files.] 

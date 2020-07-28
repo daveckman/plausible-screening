@@ -38,5 +38,23 @@ beq_LP = zeros(q,1);
 
 [~, z, exit_flag] = linprog(f_LP, A_LP, b_LP, Aeq_LP, beq_LP, [], [], []);
 R = rref(Aeq_LP);
-[~, z, exit_flag] = linprog(f_LP, A_LP, b_LP, R(1:end-1,:), beq_LP(1:end-1), [], [], []);
+%[~, z, exit_flag] = linprog(f_LP, A_LP, b_LP, R(1:end-1,:), beq_LP(1:end-1), [], [], []);
 
+%% Check if any 5 points are co-planar
+%combos = combnk(1:100,5); % too big to enumerate
+combos = combnk(1:50,5);
+for i = 1:size(combos,1)
+    vectors_to_test = exp_set(combos(i,:),:);
+    vector_diffs = vectors_to_test - vectors_to_test(1,:);
+    rank_check = rank(vector_diffs(2:5,:));
+    if rank_check <= 2
+        disp(vectors_to_test)
+        break
+    end
+end
+
+histogram(exp_set(:,1), 25);
+
+%%
+
+rand_exp_set = feas_region(randi([0, size(feas_region, 1)], 100, 1),:);
