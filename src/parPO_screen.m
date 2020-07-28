@@ -15,11 +15,11 @@ S_indicators = zeros(card_feas_region, 1);
 S_poly_indicators = zeros(card_feas_region, 1);
 D_x0s = Inf*ones(card_feas_region, 1);
 zs = zeros(card_feas_region, 1);
-PO_times = zeros(card_feas_region, 1);
-PO_relaxed_times = zeros(card_feas_region, 1);
+%PO_times = zeros(card_feas_region, 1);
+%PO_relaxed_times = zeros(card_feas_region, 1);
 
 % Plausible Optima
-p = Parn(card_feas_region);
+pPO = Par(card_feas_region);
 tic;
 parfor (l = 1:card_feas_region, cluster)
 %parfor l = 1:card_feas_region
@@ -41,16 +41,20 @@ parfor (l = 1:card_feas_region, cluster)
     % Classify solution x0 via plausible optima approach
     S_indicators(l) = (D_x0s(l) <= D_cutoff);
 
-    PO_times(l) = Par.toc;
+    pPO(l) = Par.toc;
 end % end for
 T = toc;
-fprintf('Total Time for Plausible Optima Screening = %.2f', T);
-stop(p);
+fprintf('Total Time for Plausible Optima Screening = %.2f seconds.\n', T);
+stop(pPO);
+
+flat_PO_times = par2struct(pPO);
+PO_times = flat_PO_times.ItStop - flat_PO_times.ItStart;
 
 % Plausible Optima (relaxed)
-p = Par(card_feas_region);
+pPOr = Par(card_feas_region);
 tic;
 parfor (l = 1:card_feas_region, cluster)
+%parfor l = 1:card_feas_region
     Par.tic;
     
     if mod(l, 100) == 0
@@ -74,8 +78,11 @@ parfor (l = 1:card_feas_region, cluster)
     % Classify solution x0 via relaxation
     S_poly_indicators(l) = (zs(l) >= 0);
     
-    PO_relaxed_times(l) = Par.toc;
+    pPOr(l) = Par.toc;
 end
 T = toc;
-fprintf('Total Time for Plausible Optima Screening = %.2f', T);
-stop(p);
+fprintf('Total Time for Plausible Optima (Relaxed) Screening = %.2f seconds.\n', T);
+stop(pPOr);
+
+flat_PO_relaxed_times = par2struct(pPOr);
+PO_relaxed_times = flat_PO_relaxed_times.ItStop - flat_PO_relaxed_times.ItStart;

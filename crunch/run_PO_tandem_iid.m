@@ -53,6 +53,7 @@ row = 1;
 for i1 = 0:budget
     for i2 = 0:(budget - i1)
         for i3 = 0:(budget - i1 - i2)
+            
             for i4 = 0:(budget - i1 - i2 - i3)
                 feas_region(row,:) = [i1, i2, i3, i4];
                 row = row + 1;
@@ -70,7 +71,6 @@ end
 
 load('tandem_budget_exp_set_100.mat','exp_set');
 k = size(exp_set, 1);
-
 
 n_vec = 100*ones(k, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha

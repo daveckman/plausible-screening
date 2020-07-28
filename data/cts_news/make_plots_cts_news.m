@@ -204,7 +204,7 @@ set(gca, 'FontSize', 14, 'LineWidth', 2)
 xlim([0,200])
 ylim([0,1])
 xlabel('Solution ($x$)','interpreter','latex')
-ylabel('$P(x_0 \in S)$','interpreter','latex')
+ylabel('$\mathbb{P}(x_0 \in \mathcal{S})$','interpreter','latex')
 %title(string_names{1},'interpreter','latex')
 
 % hold on
@@ -246,7 +246,7 @@ set(gca,'ytick',[]);
 set(gca,'ycolor',[1 1 1])
 hold off
 
-print(['inc_probs_ctsnews_',fn_property,'_K=5_N=400'],'-dpng','-r500')
+%print(['inc_probs_ctsnews_',fn_property,'_K=5_N=400'],'-dpng','-r500')
 
 %% Plot 1-D P(x0 in S)
 
@@ -364,7 +364,7 @@ hold off
 
 %% Make CRN plots
 myVars = {'SS_indicators_CRN', 'S_indicators_dcrn'};
-load(['ctsnews_N=4000_K=5_crn_lipschitz_proj.mat'],myVars{:});
+load(['ctsnews_N=400_K=5_crn_lipschitz_proj.mat'],myVars{:});
 
 % Compute P(x0 in S)
 inc_probs_SS_CRN = mean(SS_indicators_CRN,2);
@@ -433,7 +433,7 @@ set(gca,'ytick',[]);
 set(gca,'ycolor',[1 1 1])
 hold off
 
-print(['inc_probs_ctsnews_lipschitz_crn_STB_K=5_N=4000'],'-dpng','-r500')
+%print(['inc_probs_ctsnews_lipschitz_crn_STB_K=5_N=4000'],'-dpng','-r500')
 
 
 % %
