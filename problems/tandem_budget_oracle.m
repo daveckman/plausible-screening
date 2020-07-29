@@ -18,7 +18,7 @@ RandStream.setGlobalStream(service_stream);
 % serviced according to a FIFO discipline, each product's vector of service
 % times at all machines can be generated in advance.
 
-% HARD CODED FOR 5-MACHINE PROBLEM WITH BUDGET OF 50 RESOURCES
+% !! HARD CODED FOR 5-MACHINE PROBLEM WITH BUDGET OF 50 RESOURCES !!
 
 % Unpack configuration of machines' mean cycle times to evaluate
 budget = 50; % total number of resources to allocate across machines

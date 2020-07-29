@@ -15,15 +15,15 @@ S_indicators = zeros(card_feas_region, 1);
 S_poly_indicators = zeros(card_feas_region, 1);
 D_x0s = Inf*ones(card_feas_region, 1);
 zs = zeros(card_feas_region, 1);
-%PO_times = zeros(card_feas_region, 1);
-%PO_relaxed_times = zeros(card_feas_region, 1);
+PO_times = zeros(card_feas_region, 1);
+PO_relaxed_times = zeros(card_feas_region, 1);
 
 % Plausible Optima
-pPO = Par(card_feas_region);
+%pPO = Par(card_feas_region);
 tic;
 parfor (l = 1:card_feas_region, cluster)
 %parfor l = 1:card_feas_region
-    Par.tic;
+    %Par.tic;
     if mod(l, 100) == 0
         fprintf('Solution %d.\n', l)
     end
@@ -41,48 +41,48 @@ parfor (l = 1:card_feas_region, cluster)
     % Classify solution x0 via plausible optima approach
     S_indicators(l) = (D_x0s(l) <= D_cutoff);
 
-    pPO(l) = Par.toc;
+    %pPO(l) = Par.toc;
 end % end for
 T = toc;
 fprintf('Total Time for Plausible Optima Screening = %.2f seconds.\n', T);
-stop(pPO);
+%stop(pPO);
 
-flat_PO_times = par2struct(pPO);
-PO_times = flat_PO_times.ItStop - flat_PO_times.ItStart;
-
-% Plausible Optima (relaxed)
-pPOr = Par(card_feas_region);
-tic;
-parfor (l = 1:card_feas_region, cluster)
-%parfor l = 1:card_feas_region
-    Par.tic;
-    
-    if mod(l, 100) == 0
-        fprintf('Solution %d.\n', l)
-    end
-    
-    x0 = feas_region(l,:);
-    
-    % Setup optimization problem
-    [A, C, b] = PO_info_handle(x0, exp_set, prop_params);
-    
-    %Solve linear program to check feasibility
-    temp = check_poly_feas(discrep_string, A, C, b, sample_mean, sample_var, n_vec, D_cutoff, LP_solver_string);
-    %fprintf('Plausible check of solution [%d %d %d %d] is %f.\n', x0, temp)
-    if isempty(temp)
-        zs(l) = Inf;
-    else
-        zs(l) = temp;
-    end
-
-    % Classify solution x0 via relaxation
-    S_poly_indicators(l) = (zs(l) >= 0);
-    
-    pPOr(l) = Par.toc;
-end
-T = toc;
-fprintf('Total Time for Plausible Optima (Relaxed) Screening = %.2f seconds.\n', T);
-stop(pPOr);
-
-flat_PO_relaxed_times = par2struct(pPOr);
-PO_relaxed_times = flat_PO_relaxed_times.ItStop - flat_PO_relaxed_times.ItStart;
+%flat_PO_times = par2struct(pPO);
+%PO_times = flat_PO_times.ItStop - flat_PO_times.ItStart;
+% 
+% % Plausible Optima (relaxed)
+% %pPOr = Par(card_feas_region);
+% tic;
+% parfor (l = 1:card_feas_region, cluster)
+% %parfor l = 1:card_feas_region
+%     %Par.tic;
+%     
+%     if mod(l, 100) == 0
+%         fprintf('Solution %d.\n', l)
+%     end
+%     
+%     x0 = feas_region(l,:);
+%     
+%     % Setup optimization problem
+%     [A, C, b] = PO_info_handle(x0, exp_set, prop_params);
+%     
+%     %Solve linear program to check feasibility
+%     temp = check_poly_feas(discrep_string, A, C, b, sample_mean, sample_var, n_vec, D_cutoff, LP_solver_string);
+%     %fprintf('Plausible check of solution [%d %d %d %d] is %f.\n', x0, temp)
+%     if isempty(temp)
+%         zs(l) = Inf;
+%     else
+%         zs(l) = temp;
+%     end
+% 
+%     % Classify solution x0 via relaxation
+%     S_poly_indicators(l) = (zs(l) >= 0);
+%     
+%     %pPOr(l) = Par.toc;
+% end
+% T = toc;
+% fprintf('Total Time for Plausible Optima (Relaxed) Screening = %.2f seconds.\n', T);
+% %stop(pPOr);
+% 
+% %flat_PO_relaxed_times = par2struct(pPOr);
+% %PO_relaxed_times = flat_PO_relaxed_times.ItStop - flat_PO_relaxed_times.ItStart;

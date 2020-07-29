@@ -1,0 +1,31 @@
+MATLAB is selecting SOFTWARE OPENGL rendering.
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2020 The MathWorks, Inc.
+              R2020a Update 1 (9.8.0.1359463) 64-bit (glnxa64)
+                               April 9, 2020
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+M = 1.
+Starting parallel pool (parpool) using the 'local' profile ...
+Connected to the parallel pool (number of workers: 12).
+
+Results for problem "tandem_budget"
+	# of solutions in feasible region: 		100
+	# of solutions in experimental set: 	100
+	functional property: 					convex
+__________________________________________________________
+
+Solution 100.
+Total Time for Plausible Optima Screening = 181.12 seconds.
+Solution 100.
+Total Time for Plausible Optima (Relaxed) Screening = 165.50 seconds.
+
+Running macrorep 1 of 1.
+Screening with PO (ellinf): # solutions in subset = 2.
+Screening with PO relaxed (ellinf): # solutions in subset = 2.
+[Warning: Objects of class 'parallel.cluster.Local' cannot be saved to MAT
+files.] 
