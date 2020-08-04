@@ -1,7 +1,7 @@
 clear
 clc;
 
-fn_property = 'lipschitz_proj';
+fn_property = 'convex';
 %fn_property = 'lipschitz_proj'; % 'convex' or 'lipschitz_proj'
 
 if strcmp(fn_property, 'lipschitz_proj') == 1
@@ -163,13 +163,11 @@ end
 
 addpath('..\..\src');
 
-SX_indicators = zeros(card_feas_region, length(K_list));
+
 
 for i = 1:length(K_list)
     K = K_list(i);
     exp_set = round((1:K)'*(200/K) - (200/(2*K)));
-    %SX_indicators(:,i) = construct_det_subset(feas_region, exp_set, true_mean, 'convex', '');
-    SX_indicators(:,i) = construct_det_subset(feas_region, exp_set, true_mean, 'lipschitz_proj', 7);
 end
 
 rmpath('..\..\src');
@@ -197,14 +195,13 @@ h1 = plot(x_axis_pts, avg_subset_size_SS, 'o-', 'markerfacecolor', rgb_blue, 'Ma
 h2 = plot(x_axis_pts, avg_subset_size_S_d1, '^-', 'markerfacecolor', rgb_red, 'MarkerSize', 6, 'LineWidth', 1.5);
 h3 = plot(x_axis_pts, avg_subset_size_S_d2, 's-', 'markerfacecolor', rgb_yellow, 'MarkerSize', 6, 'LineWidth', 1.5);
 h4 = plot(x_axis_pts, avg_subset_size_S_dinf, 'p-', 'markerfacecolor', rgb_purple, 'MarkerSize', 6, 'LineWidth', 1.5);
-%line([min(x_axis_pts), max(x_axis_pts)], [sum(SX_indicators), sum(SX_indicators)], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
-plot(x_axis_pts, sum(SX_indicators,1), 'k:', 'LineWidth', 1.5);
-legend([h1, h2, h3, h4], string_names, 'location', 'southeast', 'Interpreter', 'latex');
+line([min(x_axis_pts), max(x_axis_pts)], [sum(SX_indicators), sum(SX_indicators)], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+legend([h1, h2, h3, h4], string_names, 'location', 'northeast', 'Interpreter', 'latex');
 legend boxoff
 box on
 hold off
 
-print(['avg_ss_fixedN_ctsnews_',fn_property],'-dpng','-r500')
+print(['avg_ss_fixedK_ctsnews_',fn_property],'-dpng','-r500')
 
 %x_axis_limits = [min(K_list), max(K_list)];
     %x_axis_pts = K_list;

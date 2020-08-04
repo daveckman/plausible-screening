@@ -1,9 +1,9 @@
-function run_PO_ctsnews_iid(K, N)
+function run_PO_ctsnews_iid(N, K, M)
 
 %clear;
 clc;
 
-fprintf('K = %d and N = %d.\n',K,N)
+fprintf('N = %d and K = %d and M = %d.\n',N,K,M)
 
 add_rm_paths('add');
 
@@ -16,17 +16,13 @@ maxNumCompThreads(4);
 problem_string = 'cts_newsvendor';
 oracle_string = 'cts_newsvendor_oracle';
 oracle_n_rngs = 1;
-%K = 20;
 feas_region = [1:200]';
-%exp_set = [5:10:195]';
 exp_set = round((1:K)'*(200/K) - (200/(2*K)));
-%k = K;
-%N = 400;
 
 n_vec = (N/K)*ones(K, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha
 discrep_string = 'ell1'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
-fn_props = 'lipschitz_proj'; % {'convex', 'lipschitz', 'lipschitz_proj}
+fn_props = 'convex'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = 7; % gamma for Lipschitz constant % = max(sell_price - cost, cost - salvage)
 LP_solver_string = 'MATLAB'; % {'MATLAB', 'glpk'}
 
@@ -49,8 +45,6 @@ D_cutoff_dinf = calc_cutoff(K, n_vec, alpha, 'ellinf');
 
 %% RUN MACROREPLICATIONS
 
-M = 200; % Number of macroreplications
-
 % Initialize data storage
 S_indicators_d1 = zeros(card_feas_region, M);
 S_indicators_d2 = zeros(card_feas_region, M);
@@ -62,6 +56,7 @@ SS_indicators = zeros(card_feas_region, M);
 
 print_problem_header(problem_string, feas_region, exp_set, fn_props)
 
+tic;
 parfor (m = 1:M, crunch_cluster)
 
     % Generate data using i.i.d. sampling and calculate summary statistics
@@ -88,7 +83,8 @@ parfor (m = 1:M, crunch_cluster)
     print_screening_results('ESTB', '', SS_indicators(:,m))
 
 end
+toc;
 
-save(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_iid_',fn_props,'.mat'])    
+save(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_M=',num2str(M),'_iid_',fn_props,'.mat'])    
 
 add_rm_paths('remove');
