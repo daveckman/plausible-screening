@@ -135,23 +135,25 @@ switch discrep_string
         % Optimization problem
         % D(x_0) = min_{(m, w) in P} n*(muhat - m)'*Sigma^{-1}*(muhat - m)
          
-%         % Formulate as quadratic program
-%         H_QP = [2*n_vec(1)*inv(sample_var(~zero_var_solns,~zero_var_solns)), zeros(k_bar,q); zeros(q,k_bar), zeros(q,q)];
-%         f_QP = [-2*n_vec(1)*(sample_mean(~zero_var_solns)'/sample_var(~zero_var_solns,~zero_var_solns))'; zeros(q,1)];
-%         A_QP = [A, C];
-%         b_QP = b;
-%         opt_val_offset = n_vec(1)*sample_mean(~zero_var_solns)'*(sample_var(~zero_var_solns,~zero_var_solns)\sample_mean(~zero_var_solns));
-        
-        % Eigenvalue decomposition
-        [V, D] = eig(sample_var);
-        num_zeros = sum(diag(D) < 1e-6);
-        Htilde = V(:,1 + num_zeros:end)*sqrt(D(1 + num_zeros:end, 1 + num_zeros:end));
-        H_QP = [eye(k-num_zeros), zeros(k-num_zeros,q); zeros(q,k-num_zeros), zeros(q,q)];
-        f_QP = [-sqrt(2*n_vec(1))*((sample_mean)'*pinv(Htilde'))'; zeros(q, 1)];
-        A_QP = 1/(sqrt(2*n_vec(1)))*[A, C]*Htilde;
+        % Formulate as quadratic program
+        sample_var = sample_var + 0.01*speye(k); % Crude regularization
+        H_QP = [2*n_vec(1)*inv(sample_var(~zero_var_solns,~zero_var_solns)), zeros(k_bar,q); zeros(q,k_bar), zeros(q,q)];
+        f_QP = [-2*n_vec(1)*(sample_mean(~zero_var_solns)'/sample_var(~zero_var_solns,~zero_var_solns))'; zeros(q,1)];
+        A_QP = [A, C];
         b_QP = b;
-        opt_val_offset = n_vec(1)*sample_mean'*pinv(Htilde')*pinv(Htilde)*sample_mean;
+        opt_val_offset = n_vec(1)*sample_mean(~zero_var_solns)'*(sample_var(~zero_var_solns,~zero_var_solns)\sample_mean(~zero_var_solns));
         
+%         % Eigenvalue decomposition
+%         [V, D] = eig(sample_var);
+%         num_zeros = sum(diag(D) < 1e-6);
+%         Htilde = V(:,1 + num_zeros:end)*sqrt(D(1 + num_zeros:end, 1 + num_zeros:end));
+%         H_QP = [eye(k-num_zeros), zeros(k-num_zeros,q); zeros(q,k-num_zeros), zeros(q,q)];
+%         H_QP = H_QP + 0.00001*speye(k-num_zeros + q);
+%         f_QP = [-sqrt(2*n_vec(1))*((sample_mean)'*pinv(Htilde'))'; zeros(q, 1)];
+%         A_QP = 1/(sqrt(2*n_vec(1)))*[A, C]*[Htilde, zeros(size(Htilde,1), q); zeros(q, size(Htilde,2)), eye(q)];
+%         b_QP = b;
+%         opt_val_offset = n_vec(1)*sample_mean'*pinv(Htilde')*pinv(Htilde)*sample_mean;
+%         
         
 %         % Schur decomposition approach
 %         [U, T] = schur(sample_var);
@@ -170,10 +172,14 @@ switch discrep_string
 %         opt_val_offset = n_vec(1)*sample_mean(~zero_var_solns)'*pinv(sample_var(~zero_var_solns,~zero_var_solns))*sample_mean(~zero_var_solns);
 
         % Solve quadratic program (suppress outputs) %'Display','none',
-        options = optimoptions('quadprog','Display','none'); %,'OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
+        options = optimoptions('quadprog','Display','none','MaxIter',500); %,'OptimalityTolerance',10^(-3)); % Default tolerance = 1e-8
         [~, f_val, exitflag] = quadprog(H_QP, f_QP, A_QP, b_QP, [], [], [], [], [], options);
         D_x0 = f_val + opt_val_offset;
-        if exitflag == -2 % infeasible LP
+%         if exitflag ~= 1
+%             fprintf('\nExit flag = %d. Outputting %f.',exitflag, D_x0)
+%         end
+            
+        if exitflag == -2 % infeasible QP
             D_x0 = Inf;
         end
             

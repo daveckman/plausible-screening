@@ -1,9 +1,9 @@
-function run_PO_ctsnews_crn(K, N)
+function run_PO_ctsnews_crn(N, K, M)
 
 %clear;
 clc;
 
-fprintf('K = %d and N = %d.\n',K,N)
+fprintf('N = %d and K = %d and M = %d.\n',N, K, M)
 
 add_rm_paths('add');
 
@@ -16,17 +16,13 @@ maxNumCompThreads(4);
 problem_string = 'cts_newsvendor';
 oracle_string = 'cts_newsvendor_oracle';
 oracle_n_rngs = 1;
-%K = 20;
 feas_region = [1:200]';
-%exp_set = [5:10:195]';
 exp_set = round((1:K)'*(200/K) - (200/(2*K)));
-%k = K;
-%N = 400;
 
 n_vec = (N/K)*ones(K, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha
 discrep_string = 'ell1'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
-fn_props = 'lipschitz_proj'; % {'convex', 'lipschitz', 'lipschitz_proj}
+fn_props = 'convex'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = 7; % gamma for Lipschitz constant % = max(sell_price - cost, cost - salvage)
 LP_solver_string = 'MATLAB'; % {'MATLAB', 'glpk'}
 
@@ -47,7 +43,7 @@ D_cutoff_dcrn = calc_cutoff(K, n_vec, alpha, 'CRN');
 
 %% RUN MACROREPLICATIONS
 
-M = 200; % Number of macroreplications
+%M = 200; % Number of macroreplications
 
 % Initialize data storage
 S_indicators_dcrn = zeros(card_feas_region, M);
@@ -79,6 +75,6 @@ parfor (m = 1:M, crunch_cluster)
 
 end
 
-save(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_crn_',fn_props,'.mat'])    
+save(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_M=',num2str(M),'_crn_',fn_props,'.mat'])    
 
 add_rm_paths('remove');

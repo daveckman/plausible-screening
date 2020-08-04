@@ -142,10 +142,9 @@ diff_indicators = diff(SX_indicators);
 switch_on = find(diff(SX_indicators) == 1)+1;
 switch_off = find(diff(SX_indicators) == -1);
 
-if min(switch_off) < min(switch_on) %length(switch_off) > length(switch_on)
+if min(switch_off) < min(switch_on)
     switch_on = [1; switch_on];
 end
-%elseif length(switch_on) > length(switch_off)
 if max(switch_off) < max(switch_on)
     switch_off = [switch_off; 200];
 end
@@ -398,7 +397,8 @@ hold off
 
 %% Make CRN plots
 myVars = {'SS_indicators_CRN', 'S_indicators_dcrn'};
-load(['ctsnews_N=400_K=5_crn_lipschitz_proj.mat'],myVars{:});
+load(['ctsnews_N=400_K=5_M=3000_crn_convex.mat'],myVars{:});
+%load(['ctsnews_N=400_K=5_M=3000_crn_lipschitz_proj.mat'],myVars{:});
 
 % Compute P(x0 in S)
 inc_probs_SS_CRN = mean(SS_indicators_CRN,2);
@@ -420,7 +420,7 @@ wbl_scale = 50;
 wbl_shape = 2; 
 
 feas_region = [1:200]';
-true_mean = zeros(1,length(feas_region));
+true_mean = zeros(length(feas_region),1);
 neg_profit = @(D,Q) (cost*Q + shortage*(D - min(D,Q)) - sell_price*min(D,Q) - salvage*(Q - min(D,Q)));
 for i = 1:length(true_mean)
     Q = feas_region(i);
@@ -428,16 +428,35 @@ for i = 1:length(true_mean)
 end
 [opt_val, opt_index] = min(true_mean);
 
+exp_set = [20; 60; 100; 140; 180];
+
+addpath('..\..\src');
+SX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'convex', '');
+%SX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'lipschitz_proj', 7);
+rmpath('..\..\src');
+
+diff_indicators = diff(SX_indicators);
+switch_on = find(diff(SX_indicators) == 1)+1;
+switch_off = find(diff(SX_indicators) == -1);
+
+if min(switch_off) < min(switch_on)
+    switch_on = [1; switch_on];
+end
+if max(switch_off) < max(switch_on)
+    switch_off = [switch_off; 200];
+end
+
 string_names = {'STB w/ CRN', 'PO: $d^\mathrm{CRN}$'};
 
 K = 5;
 N = 400;
-M = 1;
+M = 3000;
 alpha = 0.05;
 
-load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_crn_lipschitz_proj.mat'],'exp_set');
+%load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_crn_lipschitz_proj.mat'],'exp_set');
 
 grey_rgb = (192/256)*ones(1,3);
+dark_grey_rgb = (128/256)*ones(1,3);
 
 figure
 set(gca, 'FontSize', 14, 'LineWidth', 2)
@@ -446,25 +465,41 @@ set(gca, 'FontSize', 14, 'LineWidth', 2)
 
 axis square
 xlim([0,200])
-ylim([0,1])
+ylim([0,1.005])
 xlabel('Solution ($x$)','interpreter','latex')
-ylabel('$P(x_0 \in S)$','interpreter','latex')
+ylabel('$P(x_0 \in \mathcal{S})$','interpreter','latex')
 %title(string_names{1},'interpreter','latex')
+% 
+% hold on
+% yyaxis left
+% C = sum(SS_indicators_CRN,2)'/200;
+% %C = sum(S_indicators_dcrn,2)'/200;
+% %scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+% plot(feas_region(:,1), C, 'b-', 'LineWidth', 2)
+% line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+% yyaxis right
+% plot([1:200],true_mean, 'color', grey_rgb, 'LineWidth',1)
+% plt = gca;
+% plt.YAxis(1).Color = 'k';
+% plt.YAxis(2).Color = 'k';
+% set(gca,'ytick',[]);
+% set(gca,'ycolor',[1 1 1])
+% hold off
 
 hold on
-yyaxis left
-C = sum(SS_indicators_CRN,2)'/200;
-%C = sum(S_indicators_dcrn,2)'/200;
-%scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
-plot(feas_region(:,1), C, 'b-', 'LineWidth', 2)
+plot([1:200], (true_mean - min(true_mean))./(max(true_mean) - min(true_mean)), 'color', dark_grey_rgb, 'LineWidth', 1)
 line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
-yyaxis right
-plot([1:200],true_mean, 'color', grey_rgb, 'LineWidth',1)
-plt = gca;
-plt.YAxis(1).Color = 'k';
-plt.YAxis(2).Color = 'k';
-set(gca,'ytick',[]);
-set(gca,'ycolor',[1 1 1])
+%C = sum(SS_indicators_CRN,2)'/M;
+C = sum(S_indicators_dcrn,2)'/M;
+plot(feas_region(:,1), C, 'b-', 'LineWidth', 2);
+plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
+
+for i = 1:length(switch_on)
+    x = [switch_on(i)-.5, switch_off(i)+.5, switch_off(i)+.5, switch_on(i)-.5];
+    y = [0, 0, 1, 1]; 
+    p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.3);
+end
+box on
 hold off
 
 %print(['inc_probs_ctsnews_lipschitz_crn_STB_K=5_N=4000'],'-dpng','-r500')
