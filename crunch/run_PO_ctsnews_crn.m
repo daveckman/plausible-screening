@@ -22,7 +22,7 @@ exp_set = round((1:K)'*(200/K) - (200/(2*K)));
 n_vec = (N/K)*ones(K, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha
 discrep_string = 'ell1'; % {'ell1', 'ell2', 'ellinf', 'CRN'}
-fn_props = 'convex'; % {'convex', 'lipschitz', 'lipschitz_proj}
+fn_props = 'lipschitz_proj'; % {'convex', 'lipschitz', 'lipschitz_proj}
 prop_params = 7; % gamma for Lipschitz constant % = max(sell_price - cost, cost - salvage)
 LP_solver_string = 'MATLAB'; % {'MATLAB', 'glpk'}
 

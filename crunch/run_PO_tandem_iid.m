@@ -13,7 +13,7 @@ add_rm_paths('add');
 crunch_cluster = parcluster;
 %parpool(crunch_cluster, 'AttachedFiles', {'Par.m'});
 %pool_obj = parpool(crunch_cluster);
-maxNumCompThreads(4);
+maxNumCompThreads(8);
 %addAttachedFiles(pool_obj, {'glpk.m', 'glpkcc.mexw64'})
 
 % cts newsvendor problem

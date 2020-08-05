@@ -397,8 +397,9 @@ hold off
 
 %% Make CRN plots
 myVars = {'SS_indicators_CRN', 'S_indicators_dcrn'};
-load(['ctsnews_N=400_K=5_M=3000_crn_convex.mat'],myVars{:});
+%load(['ctsnews_N=400_K=5_M=3000_crn_convex.mat'],myVars{:});
 %load(['ctsnews_N=400_K=5_M=3000_crn_lipschitz_proj.mat'],myVars{:});
+load(['ctsnews_N=400_K=5_M=3000_crn_lipschitz_proj_reg.mat'],myVars{:});
 
 % Compute P(x0 in S)
 inc_probs_SS_CRN = mean(SS_indicators_CRN,2);
@@ -431,8 +432,8 @@ end
 exp_set = [20; 60; 100; 140; 180];
 
 addpath('..\..\src');
-SX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'convex', '');
-%SX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'lipschitz_proj', 7);
+%SX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'convex', '');
+SX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'lipschitz_proj', 7);
 rmpath('..\..\src');
 
 diff_indicators = diff(SX_indicators);
