@@ -1,6 +1,7 @@
 %load('tandem_M=1_iid_ellinf_convex.mat')
 %load('tandem_M=1_iid_ell1_convex_budget50.mat')
 load('tandem_M=1_iid_ellinf_convex_budget50.mat')
+%load('tandem_M=1_iid_ell2_convex.mat')
 
 [sort_D_x0s, rerank] = sort(D_x0s);
 
@@ -16,7 +17,7 @@ plot(1:card_feas_region, sort_D_x0s, 'b-', 'LineWidth', 2);
 line([0, card_feas_region], [D_cutoffs(discrep_index), D_cutoffs(discrep_index)], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
 hold off
 
-print(['sorted_min_discrep_tandem_ellinf'],'-dpng','-r500')
+%print(['sorted_min_discrep_tandem_ellinf'],'-dpng','-r500')
 
 %%
 % Three Colors

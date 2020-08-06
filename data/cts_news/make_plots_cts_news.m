@@ -259,8 +259,8 @@ set(gca, 'FontSize', 14, 'LineWidth', 2)
 
 xlim([0,200])
 ylim([0,1.005])
-xlabel('Solution ($x$)','interpreter','latex')
-ylabel('$P(x_0 \in \mathcal{S})$','interpreter','latex')
+xlabel('Solution ($x_0$)','interpreter','latex')
+ylabel('Probability $x_0 \in \mathcal{S}$','interpreter','latex')
 %title(string_names{1},'interpreter','latex')
 
 hold on
@@ -301,8 +301,8 @@ subplot(1,4,1)
 axis square
 xlim([0,200])
 ylim([0,1])
-xlabel('Solution ($x$)','interpreter','latex')
-ylabel('$P(x_0 \in S)$','interpreter','latex')
+xlabel('Solution ($x_0$)','interpreter','latex')
+ylabel('Probability $x_0 \in \mathcal{S}$','interpreter','latex')
 title(string_names{1},'interpreter','latex')
 
 hold on
@@ -467,8 +467,8 @@ set(gca, 'FontSize', 14, 'LineWidth', 2)
 axis square
 xlim([0,200])
 ylim([0,1.005])
-xlabel('Solution ($x$)','interpreter','latex')
-ylabel('$P(x_0 \in \mathcal{S})$','interpreter','latex')
+xlabel('Solution ($x_0$)','interpreter','latex')
+ylabel('Probability $x_0 \in \mathcal{S}$','interpreter','latex')
 %title(string_names{1},'interpreter','latex')
 % 
 % hold on
