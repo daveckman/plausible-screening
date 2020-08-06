@@ -1,4 +1,4 @@
-function run_PO_tandem_iid(M, discrep_index)
+function run_PO_tandem_iid(M, discrep_index, mode)
 %%
 %clear;
 clc;
@@ -6,7 +6,7 @@ clc;
 %M = 1;
 %discrep_index = 1;
 
-fprintf('M = %d.\n',M)
+fprintf('M = %d and discrep_index = %d and mode = %d.\n',M,discrep_index,mode)
 
 add_rm_paths('add');
 
@@ -112,7 +112,7 @@ for m = 1:M
     [sample_mean, sample_var, ~] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
     
     % Screening (using d1, d2, and dinf discrepancies)
-    [S_indicators(:,m), D_x0s(:,m), S_poly_indicators(:,m), zs(:,m), PO_times(:,m), PO_relaxed_times(:,m)] = parPO_screen(crunch_cluster, feas_region, exp_set, sample_mean, sample_var, n_vec, discrep_string, D_cutoffs(discrep_index), fn_props, prop_params, LP_solver_string);
+    [S_indicators(:,m), D_x0s(:,m), S_poly_indicators(:,m), zs(:,m), PO_times(:,m), PO_relaxed_times(:,m)] = parPO_screen(mode, crunch_cluster, feas_region, exp_set, sample_mean, sample_var, n_vec, discrep_string, D_cutoffs(discrep_index), fn_props, prop_params, LP_solver_string);
     
     fprintf('\nRunning macrorep %d of %d.\n', m, M)
     print_screening_results('PO', discrep_string, S_indicators(:,m))
@@ -120,6 +120,6 @@ for m = 1:M
 
 end
 
-save(['tandem_M=',num2str(M),'_iid_',discrep_string,'_',fn_props,'.mat'])    
+save(['tandem_M=',num2str(M),'_iid_',discrep_string,'_mode=',num2str(mode),'_',fn_props,'.mat'])    
 
 add_rm_paths('remove');

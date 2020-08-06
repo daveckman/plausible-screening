@@ -1,5 +1,7 @@
 % Make plots for tandem experiment
 
+%% Sorted discrepancy plot
+
 % Load shared data
 myVars = {'D_cutoffs','card_feas_region'};
 load('tandem_M=1_iid_ellinf_convex_budget50.mat', myVars{:});
@@ -42,3 +44,7 @@ box on
 hold off
 
 %print(['sorted_min_discrep_tandem_all'],'-dpng','-r500')
+
+%% Stacked histogram
+
+%bar(rand(10,5), 'stacked')
