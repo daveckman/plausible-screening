@@ -75,6 +75,6 @@ parfor (m = 1:M, crunch_cluster)
 
 end
 
-save(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_M=',num2str(M),'_crn_',fn_props,'.mat'])    
+save(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_M=',num2str(M),'_crn_eig_',fn_props,'.mat'])    
 
 add_rm_paths('remove');

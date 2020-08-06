@@ -1,7 +1,7 @@
 clear
 clc;
 
-fn_property = 'lipschitz_proj';
+fn_property = 'convex';
 %fn_property = 'lipschitz_proj'; % 'convex' or 'lipschitz_proj'
 
 if strcmp(fn_property, 'lipschitz_proj') == 1
@@ -138,7 +138,7 @@ SX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'convex', 
 %SX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'lipschitz_proj', 7);
 rmpath('..\..\src');
 
-diff_indicators = diff(SX_indicators);
+%diff_indicators = diff(SX_indicators);
 switch_on = find(diff(SX_indicators) == 1)+1;
 switch_off = find(diff(SX_indicators) == -1);
 
@@ -260,7 +260,7 @@ set(gca, 'FontSize', 14, 'LineWidth', 2)
 xlim([0,200])
 ylim([0,1.005])
 xlabel('Solution ($x_0$)','interpreter','latex')
-ylabel('Probability $x_0 \in \mathcal{S}$','interpreter','latex')
+ylabel('Probability of $\{x_0 \in \mathcal{S}\}$','interpreter','latex')
 %title(string_names{1},'interpreter','latex')
 
 hold on
@@ -274,12 +274,12 @@ plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 
 for i = 1:length(switch_on)
     x = [switch_on(i)-.5, switch_off(i)+.5, switch_off(i)+.5, switch_on(i)-.5];
     y = [0, 0, 1, 1]; 
-    p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.3);
+    p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.2);
 end
 box on
 hold off
 
-print(['inc_probs_ctsnews_',fn_property,'_K=5_N=400'],'-dpng','-r500')
+%print(['inc_probs_ctsnews_',fn_property,'_d2_K=5_N=400'],'-dpng','-r500')
 
 %% Plot 1-D P(x0 in S)
 
@@ -399,7 +399,9 @@ hold off
 myVars = {'SS_indicators_CRN', 'S_indicators_dcrn'};
 %load(['ctsnews_N=400_K=5_M=3000_crn_convex.mat'],myVars{:});
 %load(['ctsnews_N=400_K=5_M=3000_crn_lipschitz_proj.mat'],myVars{:});
-load(['ctsnews_N=400_K=5_M=3000_crn_lipschitz_proj_reg.mat'],myVars{:});
+%load(['ctsnews_N=400_K=5_M=3000_crn_lipschitz_proj_reg.mat'],myVars{:});
+%load(['ctsnews_N=400_K=5_M=200_crn_eig_lipschitz_proj.mat'],myVars{:});
+load(['ctsnews_N=400_K=5_M=200_crn_eig_convex.mat'],myVars{:});
 
 % Compute P(x0 in S)
 inc_probs_SS_CRN = mean(SS_indicators_CRN,2);
@@ -451,7 +453,7 @@ string_names = {'STB w/ CRN', 'PO: $d^\mathrm{CRN}$'};
 
 K = 5;
 N = 400;
-M = 3000;
+M = 200;
 alpha = 0.05;
 
 %load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_crn_lipschitz_proj.mat'],'exp_set');
@@ -468,7 +470,7 @@ axis square
 xlim([0,200])
 ylim([0,1.005])
 xlabel('Solution ($x_0$)','interpreter','latex')
-ylabel('Probability $x_0 \in \mathcal{S}$','interpreter','latex')
+ylabel('Probability of $\{x_0 \in \mathcal{S}\}$','interpreter','latex')
 %title(string_names{1},'interpreter','latex')
 % 
 % hold on

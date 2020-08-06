@@ -136,6 +136,13 @@ switch discrep_string
         % D(x_0) = min_{(m, w) in P} n*(muhat - m)'*Sigma^{-1}*(muhat - m)
          
         % Formulate as quadratic program
+%         % Regularize small eigenvalues
+%         [V, D] = eig(sample_var);
+%         eig_diag = diag(D);
+%         eig_diag(eig_diag < 1e-3) = 1e-3;
+%         D = diag(eig_diag);
+%         sample_var = V*D*inv(V);
+%         sample_var = (sample_var + sample_var')/2; % Make symmetric
         sample_var = sample_var + 0.01*speye(k); % Crude regularization
         H_QP = [2*n_vec(1)*inv(sample_var(~zero_var_solns,~zero_var_solns)), zeros(k_bar,q); zeros(q,k_bar), zeros(q,q)];
         f_QP = [-2*n_vec(1)*(sample_mean(~zero_var_solns)'/sample_var(~zero_var_solns,~zero_var_solns))'; zeros(q,1)];
