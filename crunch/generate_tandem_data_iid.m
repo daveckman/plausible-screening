@@ -66,7 +66,7 @@ m = 1;
 %for i = 1:card_feas_region
 parfor (i=1:card_feas_region, crunch_cluster)
 
-    if mod(i, 100) == 0
+    if mod(i, 1000) == 0
         fprintf('Solution %d.\n', i)
     end
     
@@ -92,6 +92,6 @@ toc;
 % Generate data using i.i.d. sampling and calculate summary statistics
 %[sample_mean, sample_var, ~] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
 
-save(['tandem_true_mean_data_n=',num2str(n)','.mat'])    
+save(['tandem_true_mean_data_n=',num2str(n)','_iid.mat'])    
 
 add_rm_paths('remove');

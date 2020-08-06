@@ -47,4 +47,36 @@ hold off
 
 %% Stacked histogram
 
-%bar(rand(10,5), 'stacked')
+load('tandem_true_mean_data_n=500_crn.mat', 'sample_mean')
+load('tandem_M=1_iid_ell2_convex_budget50.mat', 'S_indicators')
+load('tandem_M=1_iid_ell2_mode=2_convex_amended.mat', 'S_poly_indicators')
+
+opt_gap = sample_mean - min(sample_mean);
+max_opt_gap = max(opt_gap);
+%bins = linspace(0, max_opt_gap, 20);
+bins = 0:5:100;
+
+% Calculate histogram data
+[raw_X,~] = histcounts(opt_gap, bins);
+[raw_Spoly,~] = histcounts(opt_gap(S_poly_indicators == 1), bins);
+[raw_S,~] = histcounts(opt_gap(S_indicators == 1), bins);
+bin_centers = 2.5:5:97.5;
+
+figure
+set(gca, 'FontSize', 14, 'LineWidth', 2)
+xlim([0, 100])
+xlabel('Optimality Gap','interpreter','latex')
+ylabel('Number of Solutions','interpreter','latex')
+
+hold on
+bar(bin_centers, [raw_S; raw_Spoly - raw_S; raw_X - raw_Spoly]', 1, 'stacked', 'LineWidth', 1)
+%histogram(opt_gap, bins);
+%histogram(opt_gap(S_poly_indicators == 1), bins);
+%histogram(opt_gap(S_indicators == 1), bins);
+
+legend_strings = {'$\mathcal{S}$', '$\mathcal{S}_{\mathrm{poly}}$', '$\mathcal{X}$'};
+legend(legend_strings, 'location', 'northeast', 'Interpreter', 'latex');
+legend boxoff
+hold off
+
+print('histogram_opt_gap_tandem','-dpng','-r500')
