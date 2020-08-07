@@ -399,9 +399,9 @@ hold off
 myVars = {'SS_indicators_CRN', 'S_indicators_dcrn'};
 %load(['ctsnews_N=400_K=5_M=3000_crn_convex.mat'],myVars{:});
 %load(['ctsnews_N=400_K=5_M=3000_crn_lipschitz_proj.mat'],myVars{:});
-%load(['ctsnews_N=400_K=5_M=3000_crn_lipschitz_proj_reg.mat'],myVars{:});
+load(['ctsnews_N=400_K=5_M=3000_crn_lipschitz_proj_reg.mat'],myVars{:});
 %load(['ctsnews_N=400_K=5_M=200_crn_eig_lipschitz_proj.mat'],myVars{:});
-load(['ctsnews_N=400_K=5_M=200_crn_eig_convex.mat'],myVars{:});
+%load(['ctsnews_N=400_K=5_M=200_crn_eig_convex.mat'],myVars{:});
 
 % Compute P(x0 in S)
 inc_probs_SS_CRN = mean(SS_indicators_CRN,2);
@@ -453,7 +453,7 @@ string_names = {'STB w/ CRN', 'PO: $d^\mathrm{CRN}$'};
 
 K = 5;
 N = 400;
-M = 200;
+M = 3000;
 alpha = 0.05;
 
 %load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_crn_lipschitz_proj.mat'],'exp_set');
@@ -492,20 +492,20 @@ ylabel('Probability of $\{x_0 \in \mathcal{S}\}$','interpreter','latex')
 hold on
 plot([1:200], (true_mean - min(true_mean))./(max(true_mean) - min(true_mean)), 'color', dark_grey_rgb, 'LineWidth', 1)
 line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
-%C = sum(SS_indicators_CRN,2)'/M;
-C = sum(S_indicators_dcrn,2)'/M;
+C = sum(SS_indicators_CRN,2)'/M;
+%C = sum(S_indicators_dcrn,2)'/M;
 plot(feas_region(:,1), C, 'b-', 'LineWidth', 2);
-plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
+%plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
 
-for i = 1:length(switch_on)
-    x = [switch_on(i)-.5, switch_off(i)+.5, switch_off(i)+.5, switch_on(i)-.5];
-    y = [0, 0, 1, 1]; 
-    p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.3);
-end
+% for i = 1:length(switch_on)
+%     x = [switch_on(i)-.5, switch_off(i)+.5, switch_off(i)+.5, switch_on(i)-.5];
+%     y = [0, 0, 1, 1]; 
+%     p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.2);
+% end
 box on
 hold off
 
-%print(['inc_probs_ctsnews_lipschitz_crn_STB_K=5_N=4000'],'-dpng','-r500')
+%print(['inc_probs_ctsnews_lipschitz_crn_STB_K=5_N=400'],'-dpng','-r500')
 
 
 % %
