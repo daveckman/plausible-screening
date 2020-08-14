@@ -32,9 +32,9 @@ h1 = plot(log(sort(D_x0s_d1)/D_cutoffs(1)), 'color', rgb_red, 'LineWidth', 2);
 h2 = plot(log(sort(D_x0s_d2)/D_cutoffs(2)), 'color', rgb_yellow, 'LineWidth', 2);
 h3 = plot(log(sort(D_x0s_dinf)/D_cutoffs(3)), 'color', rgb_purple, 'LineWidth', 2);
 line([0,card_feas_region], [0, 0], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5);
-line([sum(D_x0s_d1 <= D_cutoffs(1)), sum(D_x0s_d1 <= D_cutoffs(1))], [-2, 0], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5);
-line([sum(D_x0s_d2 <= D_cutoffs(2)), sum(D_x0s_d2 <= D_cutoffs(2))], [-2, 0], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5);
-line([sum(D_x0s_dinf <= D_cutoffs(3)), sum(D_x0s_dinf <= D_cutoffs(3))], [-2, 0], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5);
+line([sum(D_x0s_d1 <= D_cutoffs(1)), sum(D_x0s_d1 <= D_cutoffs(1))], [-2, 0], 'Color', rgb_red, 'LineStyle', ':', 'LineWidth', 1.5);
+line([sum(D_x0s_d2 <= D_cutoffs(2)), sum(D_x0s_d2 <= D_cutoffs(2))], [-2, 0], 'Color', rgb_yellow, 'LineStyle', ':', 'LineWidth', 1.5);
+line([sum(D_x0s_dinf <= D_cutoffs(3)), sum(D_x0s_dinf <= D_cutoffs(3))], [-2, 0], 'Color', rgb_purple, 'LineStyle', ':', 'LineWidth', 1.5);
 %plot([0, card_feas_region], [0, 0], 'k:', 'LineWidth', 1.5);
 legend([h1, h2, h3], string_names, 'location', 'northwest', 'Interpreter', 'latex');
 legend boxoff
@@ -74,9 +74,9 @@ bar(bin_centers, [raw_S; raw_Spoly - raw_S; raw_X - raw_Spoly]', 1, 'stacked', '
 %histogram(opt_gap(S_poly_indicators == 1), bins);
 %histogram(opt_gap(S_indicators == 1), bins);
 
-legend_strings = {'$\mathcal{S}$', '$\mathcal{S}_{\mathrm{poly}}$', '$\mathcal{X}$'};
+legend_strings = {'$\mathcal{S}$', '$\mathcal{S}_{\mathrm{poly}}\backslash \mathcal{S}$', '$\mathcal{X} \backslash \mathcal{S}_{\mathrm{poly}}$'};
 legend(legend_strings, 'location', 'northeast', 'Interpreter', 'latex');
 legend boxoff
 hold off
 
-print('histogram_opt_gap_tandem','-dpng','-r500')
+%print('histogram_opt_gap_tandem','-dpng','-r500')
