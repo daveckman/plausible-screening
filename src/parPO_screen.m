@@ -25,7 +25,7 @@ if mode == 1 % PO
     parfor (l = 1:card_feas_region, cluster)
     %parfor l = 1:card_feas_region
         %Par.tic;
-        if mod(l, 100) == 0
+        if mod(l, 1000) == 0
             fprintf('Solution %d.\n', l)
         end
 
