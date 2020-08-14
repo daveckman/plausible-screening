@@ -1,0 +1,17 @@
+Tandem timings
+
+Mean screening time based on 1000 random solutions:
+d1 = 0.077sec/soln
+d1 (relaxed) = 0.429sec/soln
+d2 = 1.626sec/soln
+d2 (relaxed) = 0.327sec/soln
+dinf = 0.399sec/soln
+dinf (relaxed) = 0.278sec/soln
+
+Total times for all 316251 systems (on 8 cores)
+d1 = 1918.52sec (4 cores?)
+d1 (relaxed) = 9792.08sec
+d2 = 37324.60sec
+d2 (relaxed) = 16612.75sec
+dinf = 11547.85sec
+dinf (relaxed) = 11775.28sec
