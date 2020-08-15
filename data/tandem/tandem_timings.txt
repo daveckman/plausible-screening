@@ -8,10 +8,20 @@ d2 (relaxed) = 0.327sec/soln
 dinf = 0.399sec/soln
 dinf (relaxed) = 0.278sec/soln
 
-Total times for all 316251 systems (on 8 cores)
-d1 = 1918.52sec (4 cores?)
-d1 (relaxed) = 9792.08sec
-d2 = 37324.60sec
-d2 (relaxed) = 16612.75sec
-dinf = 11547.85sec
-dinf (relaxed) = 11775.28sec
+Macrorep 1:
+Total times for all 316,251 systems (on 8 cores)
+d1 = 1918.52sec (4 cores?) -> |S| = 123,904
+d1 (relaxed) = 9792.08sec -> |Spoly| = 316,251
+d2 = 37324.60sec -> |S| = 69,198
+d2 (relaxed) = 16612.75sec -> |Spoly| = 83,748
+dinf = 11547.85sec -> |S| = 61,897
+dinf (relaxed) = 11775.28sec -> |Spoly| = 61,897
+
+Macrorep 2:
+Total times for all 316,251 systems (on 8 cores)
+d1 = 796.36sec -> |S| = 122,733
+d1 (relaxed) = 9798.93sec -> |Spoly| = 316,251
+d2 = 18421.81sec -> |S| = 69,363
+d2 (relaxed) = 32873.06sec -> |Spoly| = 84,226
+dinf = ERROR -> |S| = ERROR
+dinf (relaxed) = 34563.45sec -> |Spoly| = 61,796

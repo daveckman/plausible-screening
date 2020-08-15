@@ -12,10 +12,10 @@ addpath('../../src')
 %maxNumCompThreads(4);
 
 load('tandem_m=2_iid_ellinf_mode=2_convex.mat')
-D_cutoff = D_cutoffs(3);
+%D_cutoff = D_cutoffs(3);
 
 %load('tandem_m=2_iid_ell2_mode=2_convex.mat')
-%D_cutoff = D_cutoffs(2);
+D_cutoff = D_cutoffs(2);
 
 bug_soln_indices = find(zs == Inf);
 
@@ -71,5 +71,5 @@ S_poly_indicators(bug_soln_indices) = (temp_zs >= 0);
 rmpath('../../tools')
 rmpath('../../src')
 
-save('tandem_m=2_iid_ellinf_mode=2_convex_amended.mat')
-%save('tandem_m=2_iid_ell2_mode=2_convex_amended.mat')
+%save('tandem_M=1_iid_ellinf_mode=2_convex_amended.mat')
+save('tandem_m=2_iid_ell2_mode=2_convex_amended.mat')
