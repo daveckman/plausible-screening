@@ -175,7 +175,7 @@ rmpath('..\..\src');
 
 
 %% Plotting Setup
-string_names = {'STB', 'PO: $d^1$', 'PO: $d^2$', 'PO: $d^{\infty}$'};
+string_names = {'STB', 'PS: $d^1_{\mathsf{n}}$', 'PS: $d^2_{\mathsf{n}}$', 'PS: $d^{\infty}_{\mathsf{n}}$'};
 colors = {'k-', 'b-', 'g-', 'm-'};
 rgb_blue = [0, 0.4470, 0.7410];	
 rgb_red = [0.8500, 0.3250, 0.0980]; 
@@ -189,7 +189,7 @@ set(gca, 'FontSize', 14, 'LineWidth', 2)
 xlim(x_axis_limits)
 ylim([0,200])
 xlabel(x_axis_label,'interpreter','latex')
-ylabel('Average Subset Size ($|\mathcal{S}|$)','interpreter','latex')
+ylabel('Average Subset Size','interpreter','latex')
 %title(plt_title)
 hold on
 h1 = plot(x_axis_pts, avg_subset_size_SS, 'o-', 'markerfacecolor', rgb_blue, 'MarkerSize', 6, 'LineWidth', 1.5);
@@ -260,7 +260,7 @@ set(gca, 'FontSize', 14, 'LineWidth', 2)
 xlim([0,200])
 ylim([0,1.005])
 xlabel('Solution ($x_0$)','interpreter','latex')
-ylabel('Probability of $\{x_0 \in \mathcal{S}\}$','interpreter','latex')
+ylabel('Probability of $x_0$ in Subset','interpreter','latex')
 %title(string_names{1},'interpreter','latex')
 
 hold on
@@ -302,7 +302,7 @@ axis square
 xlim([0,200])
 ylim([0,1])
 xlabel('Solution ($x_0$)','interpreter','latex')
-ylabel('Probability $x_0 \in \mathcal{S}$','interpreter','latex')
+ylabel('Probability $x_0$ in Subset','interpreter','latex')
 title(string_names{1},'interpreter','latex')
 
 hold on
@@ -466,11 +466,11 @@ set(gca, 'FontSize', 14, 'LineWidth', 2)
 
 %
 
-axis square
+%axis square
 xlim([0,200])
 ylim([0,1.005])
 xlabel('Solution ($x_0$)','interpreter','latex')
-ylabel('Probability of $\{x_0 \in \mathcal{S}\}$','interpreter','latex')
+ylabel('Probability of $x_0$ in Subset','interpreter','latex')
 %title(string_names{1},'interpreter','latex')
 % 
 % hold on
@@ -492,16 +492,16 @@ ylabel('Probability of $\{x_0 \in \mathcal{S}\}$','interpreter','latex')
 hold on
 plot([1:200], (true_mean - min(true_mean))./(max(true_mean) - min(true_mean)), 'color', dark_grey_rgb, 'LineWidth', 1)
 line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
-C = sum(SS_indicators_CRN,2)'/M;
-%C = sum(S_indicators_dcrn,2)'/M;
+%C = sum(SS_indicators_CRN,2)'/M;
+C = sum(S_indicators_dcrn,2)'/M;
 plot(feas_region(:,1), C, 'b-', 'LineWidth', 2);
-%plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
+plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
 
-% for i = 1:length(switch_on)
-%     x = [switch_on(i)-.5, switch_off(i)+.5, switch_off(i)+.5, switch_on(i)-.5];
-%     y = [0, 0, 1, 1]; 
-%     p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.2);
-% end
+for i = 1:length(switch_on)
+    x = [switch_on(i)-.5, switch_off(i)+.5, switch_off(i)+.5, switch_on(i)-.5];
+    y = [0, 0, 1, 1]; 
+    p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.2);
+end
 box on
 hold off
 

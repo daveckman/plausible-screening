@@ -16,7 +16,7 @@ D_x0s_dinf = D_x0s;
 
 
 % Plotting Setup
-string_names = {'PO: $d^1$', 'PO: $d^2$', 'PO: $d^{\infty}$'};
+string_names = {'PS: $d^1_{\mathsf{n}}$', 'PS: $d^2_{\mathsf{n}}$', 'PS: $d^{\infty}_{\mathsf{n}}$'};
 rgb_red = [0.8500, 0.3250, 0.0980]; 
 rgb_yellow = [0.9290, 0.6940, 0.1250];
 rgb_purple = [0.4940, 0.1840, 0.5560];
@@ -25,7 +25,7 @@ figure
 set(gca, 'FontSize', 14, 'LineWidth', 2)
 xlim([0, card_feas_region])
 xlabel('Sorted Solutions','interpreter','latex')
-ylabel('$\log(D(x_0, \widehat{\mu}, \widehat{\Sigma}, n)/\mathsf{D})$','interpreter','latex')
+ylabel('$\log(D_{\mathsf{n}}(x_0, \widehat{\mu}, \widehat{\Sigma})/\mathsf{D})$','interpreter','latex')
 hold on
 %plot(1:card_feas_region, sort_D_x0s, 'b-', 'LineWidth', 2);
 h1 = plot(log(sort(D_x0s_d1)/D_cutoffs(1)), 'color', rgb_red, 'LineWidth', 2);
@@ -74,7 +74,7 @@ bar(bin_centers, [raw_S; raw_Spoly - raw_S; raw_X - raw_Spoly]', 1, 'stacked', '
 %histogram(opt_gap(S_poly_indicators == 1), bins);
 %histogram(opt_gap(S_indicators == 1), bins);
 
-legend_strings = {'$\mathcal{S}$', '$\mathcal{S}_{\mathrm{poly}}\backslash \mathcal{S}$', '$\mathcal{X} \backslash \mathcal{S}_{\mathrm{poly}}$'};
+legend_strings = {'$\mathcal{S}^{\mathrm{PS}}_{\mathsf{n}}$', '$\mathcal{S}^{\mathrm{RPS}}_{\mathsf{n}}\backslash \mathcal{S}^{\mathrm{PS}}_{\mathsf{n}}$', '$\mathcal{X} \backslash \mathcal{S}^{\mathrm{RPS}}_{\mathsf{n}}$'};
 legend(legend_strings, 'location', 'northeast', 'Interpreter', 'latex');
 legend boxoff
 hold off
