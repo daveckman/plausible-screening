@@ -1,2 +1,2 @@
-# plausible-optima-experiments
- Numerical experiments for plausible optima
+# plausible-screening-experiments
+ Numerical experiments for plausible screening
