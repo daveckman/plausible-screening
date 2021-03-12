@@ -21,7 +21,7 @@ end
 
 %% RUN MACROREPLICATIONS
 
-M = 1; % Number of macroreplications
+M = 100; % Number of macroreplications
 
 % Calculate cutoffs for PS
 D_cutoff_d2 = calc_cutoff(k, n_vec, alpha, 'ell2');
@@ -38,7 +38,7 @@ D_x0s = zeros(card_feas_region, M);
 
 print_problem_header(problem_string, feas_region, exp_set, fn_props)
 
-for m = 1:M
+parfor m = 1:M
     
     fprintf('Running macrorep %d of %d.\n', m, M)
     
@@ -146,9 +146,11 @@ ylabel('Probability of $x_0$ in Subset','interpreter','latex')
 hold on
 plot([1:200], (true_mean - min(true_mean))./(max(true_mean) - min(true_mean)), 'color', dark_grey_rgb, 'LineWidth', 1)
 line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
-C = mean(S_indicators_d2,2); %sum(all_S_indicators_d2(:,:,1),2)'/M;
+C3 = mean(S_indicators_d2,2); %sum(all_S_indicators_d2(:,:,1),2)'/M;
+C5 = mean(S_poly_indicators_d2,2); 
 %scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
-plot(feas_region(:,1), C, 'b-', 'LineWidth', 2);
+h1 = plot(feas_region(:,1), C3, 'b-', 'LineWidth', 2);
+h2 = plot(feas_region(:,1), C5, 'r-', 'LineWidth', 2);
 plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
 
 for i = 1:length(switch_on)
@@ -156,6 +158,9 @@ for i = 1:length(switch_on)
     y = [0, 0, 1, 1]; 
     p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.2);
 end
+
+legend([h1, h2], 'PS w/ d2', 'RPS w/ d2')
+
 box on
 hold off
 
@@ -179,9 +184,9 @@ end
 
 %% Plot single 1-D P(x0 in S) for dgrad
 
-K = 5;
-N = 400;
-M = 200;
+%K = 5;
+%N = 400;
+%M = 200;
 
 alpha = 0.05;
 %load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_M=',num2str(M),'_iid_',fn_property,'.mat'],'exp_set');
@@ -200,9 +205,9 @@ ylabel('Probability of $x_0$ in Subset','interpreter','latex')
 hold on
 plot([1:200], (true_mean - min(true_mean))./(max(true_mean) - min(true_mean)), 'color', dark_grey_rgb, 'LineWidth', 1)
 line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
-C = mean(S_poly_indicators_grad,2); %sum(all_S_indicators_d2(:,:,1),2)'/M;
+C4 = mean(S_poly_indicators_grad,2); %sum(all_S_indicators_d2(:,:,1),2)'/M;
 %scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
-plot(feas_region(:,1), C, 'b-', 'LineWidth', 2);
+plot(feas_region(:,1), C4, 'b-', 'LineWidth', 2);
 plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
 
 for i = 1:length(switch_on)
@@ -210,5 +215,114 @@ for i = 1:length(switch_on)
     y = [0, 0, 1, 1]; 
     p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.2);
 end
+box on
+hold off
+
+%% 
+% CHECK RGPS WITH PLUGGING IN TRUE GRADIENTS
+%M = 100;
+
+exact_grads = true_grad(exp_set,:);
+
+D_grad = calc_grad_cutoff(k, d, n_vec, alpha);
+D_d2 = calc_cutoff(k, n_vec, alpha, 'ell2');
+
+S_test_indicators_grad = zeros(card_feas_region, M);
+
+parfor m = 1:M
+    
+    fprintf('Running macrorep %d of %d.\n', m, M)
+    
+    % SAMPLING
+    
+    % Generate data and calculate summary statistics
+    fprintf('Generating sample data for plausible optima...\n')
+    [sample_mean, sample_var, sample_mean_grad, sample_full_cov] = generate_grad_data(m, 'cts_newsvendor_grad_oracle', oracle_n_rngs, exp_set, n_vec, 'grad');
+
+    %[sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
+    S_testg_indicators_grad(:,m) = RGPSexact_screen(feas_region, exp_set, sample_mean, sample_var, exact_grads, n_vec, D_grad);
+    S_test2_indicators_grad(:,m) = RGPSexact_screen(feas_region, exp_set, sample_mean, sample_var, exact_grads, n_vec, D_d2);
+    fprintf('\nResults of RGPS screening (using exact gradients)\n-------------------------------------------------------\n')
+    fprintf('\tstandardized discrepancy: \t\t\t\t Gradients\n')
+    fprintf('\t# of solutions in GPS relaxed subset: \t%d\n\n', sum(S_testg_indicators_grad(:,m)))
+    fprintf('\t# of solutions in GPS relaxed subset (d2 cutoff): \t%d\n\n', sum(S_test2_indicators_grad(:,m)))
+
+end
+
+%%
+
+figure
+
+alpha = 0.05;
+%load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_M=',num2str(M),'_iid_',fn_property,'.mat'],'exp_set');
+
+grey_rgb = (192/256)*ones(1,3);
+dark_grey_rgb = (128/256)*ones(1,3);
+figure
+set(gca, 'FontSize', 14, 'LineWidth', 2)
+
+xlim([0,200])
+ylim([0,1.005])
+xlabel('Solution ($x_0$)','interpreter','latex')
+ylabel('Probability of $x_0$ in Subset','interpreter','latex')
+%title(string_names{1},'interpreter','latex')
+
+hold on
+plot([1:200], (true_mean - min(true_mean))./(max(true_mean) - min(true_mean)), 'color', dark_grey_rgb, 'LineWidth', 1)
+line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+C1 = mean(S_testg_indicators_grad,2); %sum(all_S_indicators_d2(:,:,1),2)'/M;
+C2 = mean(S_test2_indicators_grad,2); %sum(all_S_indicators_d2(:,:,1),2)'/M;
+%scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+h3 = plot(feas_region(:,1), C4, 'r-', 'LineWidth', 2);
+h4 = plot(feas_region(:,1), C1, 'g-', 'LineWidth', 2);
+h5 = plot(feas_region(:,1), C2, 'b-', 'LineWidth', 2);
+plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
+
+for i = 1:length(switch_on)
+    x = [switch_on(i)-.5, switch_off(i)+.5, switch_off(i)+.5, switch_on(i)-.5];
+    y = [0, 0, 1, 1]; 
+    p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.2);
+end
+
+legend([h3, h4, h5], 'GRPS', 'RPS w/ Dgrad w/ exact grad', 'RPS w/ D2 w/ exact grad')
+
+box on
+hold off
+
+
+%%
+
+figure
+
+alpha = 0.05;
+%load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_M=',num2str(M),'_iid_',fn_property,'.mat'],'exp_set');
+
+grey_rgb = (192/256)*ones(1,3);
+dark_grey_rgb = (128/256)*ones(1,3);
+figure
+set(gca, 'FontSize', 14, 'LineWidth', 2)
+
+xlim([0,200])
+ylim([0,1.005])
+xlabel('Solution ($x_0$)','interpreter','latex')
+ylabel('Probability of $x_0$ in Subset','interpreter','latex')
+%title(string_names{1},'interpreter','latex')
+
+hold on
+plot([1:200], (true_mean - min(true_mean))./(max(true_mean) - min(true_mean)), 'color', dark_grey_rgb, 'LineWidth', 1)
+line([0,200], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+%scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+h6 = plot(feas_region(:,1), C5, 'r-', 'LineWidth', 2);
+h7 = plot(feas_region(:,1), C2, 'b-', 'LineWidth', 2);
+plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
+
+for i = 1:length(switch_on)
+    x = [switch_on(i)-.5, switch_off(i)+.5, switch_off(i)+.5, switch_on(i)-.5];
+    y = [0, 0, 1, 1]; 
+    p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.2);
+end
+
+legend([h6, h7], 'RPS w/ d2', 'RPS w/ D2 w/ exact grad')
+
 box on
 hold off
