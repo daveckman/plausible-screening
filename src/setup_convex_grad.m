@@ -83,12 +83,13 @@ b = zeros(num_constraints, 1);
 
 % FOR GRADIENTS:
 % move dummy variables over to A
-A = [A, C(:,1:k*d)];
+%A = [A, C(:,1:k*d)];
+A = [A, C(:,2:(k*d+1))];
 % reorder columns of A
 concat = [1:k; reshape(k+(1:(k*d)), d, k)];
 concat = reshape(concat, k*(d+1), 1);
 A = A(:,concat);
-C = C(:,k*d+1);
-
+%C = C(:,k*d+1);
+C = C(:,1);
 end
 

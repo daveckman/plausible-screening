@@ -28,11 +28,12 @@ zetahat = reshape(concat, k*(d+1), 1);
 % D(x_0) = min_{(z, w) in P} sum_i n_i*(zetahat_i - z_i)'*Psi_i^{-1}*(zetaha_i - z_i)
 
 % Add correct to diagonal before taking inverse: epsilon = 1
-epsilon = 1;
+%epsilon = 1;
 
 H_QP = sparse(k*(d+1)+q, k*(d+1)+q); % with padding
 for i = 1:k
-    H_QP((d+1)*(i-1)+1 : (d+1)*i, (d+1)*(i-1)+1 : (d+1)*i) = 0.5*n_vec(i)*inv(sample_full_cov(:,:,i) + epsilon*eye(d+1));
+    %H_QP((d+1)*(i-1)+1 : (d+1)*i, (d+1)*(i-1)+1 : (d+1)*i) = 0.5*n_vec(i)*inv(sample_full_cov(:,:,i) + epsilon*eye(d+1));
+    H_QP((d+1)*(i-1)+1 : (d+1)*i, (d+1)*(i-1)+1 : (d+1)*i) = 0.5*n_vec(i)*inv(sample_full_cov(:,:,i)); %+ epsilon*eye(d+1));
 end
 % Add another correction
 H_QP = H_QP + 0.01*speye(k*(d+1)+q);
