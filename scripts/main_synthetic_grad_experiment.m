@@ -27,6 +27,7 @@ M = 10; % Number of macroreplications
 D_cutoff_d2 = calc_cutoff(k, n_vec, alpha, 'ell2');
 d = size(feas_region, 2);
 D_cutoff_grad = calc_grad_cutoff(k, d, n_vec, alpha);
+D_cutoff_gradinf = calc_gradinf_cutoff(k, d, n_vec, alpha);
 
 % Initialize data storage
 S_indicators_d2 = zeros(card_feas_region, M);
@@ -68,6 +69,12 @@ parfor m = 1:M
     fprintf('\t# of solutions in GPS subset: \t\t\t%d\n', sum(S_indicators_grad(:,m)))  
     fprintf('\t# of solutions in GPS relaxed subset: \t%d\n\n', sum(S_poly_indicators_grad(:,m)))
 
+    % Gradient Plausible Screening w/ Dgradinf
+    [S_indicators_gradinf(:,m), D_x0s_gradinf(:,m), S_poly_indicators_gradinf(:,m)] = GPSinf_screen(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_gradinf);
+    fprintf('\nResults of GPS screening (dinf) \n-------------------------------------------------------\n')
+    fprintf('\tstandardized discrepancy: \t\t\t\t Gradients\n')
+    fprintf('\t# of solutions in GPS inf subset: \t\t\t%d\n', sum(S_indicators_gradinf(:,m)))  
+    fprintf('\t# of solutions in GPS inf relaxed subset: \t%d\n\n', sum(S_poly_indicators_gradinf(:,m)))
 end
 
 %%
@@ -183,6 +190,47 @@ for i = 1:length(switch_on)
 end
 
 legend([h3, h4], 'GPS w/ dgrad', 'RGPS w/ dgrad', 'Location', 'southeast')
+
+box on
+hold off
+
+%% Plot single 1-D P(x0 in S) for dgradinf
+
+%K = 5;
+%N = 400;
+%M = 200;
+
+alpha = 0.05;
+%load(['ctsnews_N=',num2str(N),'_K=',num2str(K),'_M=',num2str(M),'_iid_',fn_property,'.mat'],'exp_set');
+
+grey_rgb = (192/256)*ones(1,3);
+dark_grey_rgb = (128/256)*ones(1,3);
+figure
+set(gca, 'FontSize', 14, 'LineWidth', 2)
+
+xlim([0,1])
+ylim([0,1.005])
+xlabel('Solution ($x_0$)','interpreter','latex')
+ylabel('Probability of $x_0$ in Subset','interpreter','latex')
+%title(string_names{1},'interpreter','latex')
+
+hold on
+plot(feas_region, (true_mean - min(true_mean))./(max(true_mean) - min(true_mean)), 'color', dark_grey_rgb, 'LineWidth', 1)
+line([0,1], [1-alpha, 1-alpha], 'Color', 'black', 'LineStyle', ':', 'LineWidth', 1.5)
+C9 = mean(S_indicators_gradinf,2); %sum(all_S_indicators_d2(:,:,1),2)'/M;
+C10 = mean(S_poly_indicators_gradinf,2); %sum(all_S_indicators_d2(:,:,1),2)'/M;
+%scatter(feas_region(:,1), C, 'ko','markerfacecolor','k')
+h4 = plot(feas_region(:,1), C10, 'r-', 'LineWidth', 2);
+h3 = plot(feas_region(:,1), C9, 'b-', 'LineWidth', 2);
+plot(exp_set,zeros(1,size(exp_set,2)),'kx','markerfacecolor','k', 'MarkerSize', 12, 'LineWidth', 1)
+
+for i = 1:length(switch_on)
+    x = [switch_on(i)-.5, switch_off(i)+.5, switch_off(i)+.5, switch_on(i)-.5]/card_feas_region;
+    y = [0, 0, 1, 1]; 
+    p=patch(x,y,'b','LineStyle','none','FaceAlpha',0.2);
+end
+
+legend([h3, h4], 'GPS w/ dgradinf', 'RGPS w/ dgradinf', 'Location', 'southeast')
 
 box on
 hold off
