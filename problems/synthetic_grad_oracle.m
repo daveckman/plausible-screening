@@ -5,8 +5,8 @@ function [outputs, gradients] = synthetic_grad_oracle(oracle_rngs, solution, n_r
 % Input solution is a row vector.
 
 % Simulate noisy observations and gradients from
-% mu(x) = 4*(x-0.5)^2
-% GRAD mu(x) = 8*x - 4
+% mu(x) = x^2 - 0.5*x + 1
+% GRAD mu(x) = 2*x - 0.5
 
 % Unpack random number streams
 noise_stream = oracle_rngs{1};
@@ -21,7 +21,7 @@ grad_noise = 0.5 + (x-0.5)^2;
 rho = 0.5;
 
 % (Y, G) will be generated according to MVN(MU, SIGMA)
-MU = [4*(x-0.5)^2, 8*x-4];
+MU = [x^2 - 0.5*x + 1, 2*x - 0.5];
 SIGMA = [mu_noise, rho*sqrt(mu_noise)*sqrt(grad_noise); rho*sqrt(mu_noise)*sqrt(grad_noise), grad_noise];
 
 % Initialize for storage

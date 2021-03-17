@@ -21,7 +21,7 @@ card_feas_region = size(feas_region, 1);
 
 %% RUN MACROREPLICATIONS
 
-M = 100; % Number of macroreplications
+M = 10; % Number of macroreplications
 
 % Calculate cutoffs for PS
 D_cutoff_d2 = calc_cutoff(k, n_vec, alpha, 'ell2');
@@ -52,6 +52,7 @@ parfor m = 1:M
 
     %[sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
 
+    % Original Plausible Screening
     discrep_string = 'ell2';
     fprintf('Screening solutions for %s discrepancy...\n', discrep_string)
     [S_indicators_d2(:,m), D_x0s(:,m), S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, 'ell2', D_cutoff_d2, fn_props, prop_params, LP_solver_string);
@@ -60,6 +61,7 @@ parfor m = 1:M
     fprintf('\t# of solutions in PS subset: \t\t\t%d\n', sum(S_indicators_d2(:,m)))  
     fprintf('\t# of solutions in PS relaxed subset: \t%d\n\n', sum(S_poly_indicators_d2(:,m)))
 
+    % Gradient Plausible Screening w/ Dgrad
     [S_indicators_grad(:,m), D_x0s_grad(:,m), S_poly_indicators_grad(:,m)] = GPS_screen(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_grad);
     fprintf('\nResults of GPS screening\n-------------------------------------------------------\n')
     fprintf('\tstandardized discrepancy: \t\t\t\t Gradients\n')
@@ -71,11 +73,10 @@ end
 %%
 % CALCULATE TRUE OBJECTIVE FUNCTIONS AND TRUE GRADIENTS
 
-% mu(x) = 4*(x-1/2)^2
-% GRAD mu(x) = 8*x - 4
-true_mean = 4*(feas_region - 1/2).^2;
-true_grad = 8*feas_region - 4;
-%opt_gap = true_mean; % - 0
+% mu(x) = x^2 - 0.5*x + 1
+% GRAD mu(x) = 2*x - 0.5
+true_mean = feas_region.^2 - 0.5*feas_region + 1;
+true_grad = 2*feas_region - 0.5;
 
 %%
 % COMPUTE S(X)
@@ -90,15 +91,6 @@ end
 if max(switch_off) < max(switch_on)
     switch_off = [switch_off; 200];
 end
-
-%%
-% PLOTTING SUBSETS
-
-fn_property = 'convex';
-plt_title = 'Convex';
-
-% Compute P(x0 in S)
-inc_probs_S_d2 = mean(S_indicators_d2,2);
 
 %% Plot single 1-D P(x0 in S) for d2
 
