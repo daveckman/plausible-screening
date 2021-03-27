@@ -81,7 +81,7 @@ else % otherwise do independent sampling
         % Calculate summary statistics
         sample_mean(i) = mean(outputs);
         sample_var(i) = var(outputs);
-        sample_mean_grad(i,:) = mean(gradients)';
+        sample_mean_grad(i,:) = mean(gradients,2)';
         sample_full_cov(:,:,i) = 0.001*eye(d+1) + cov([outputs; gradients]');
                 
     end % end for
