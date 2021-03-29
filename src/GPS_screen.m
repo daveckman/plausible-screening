@@ -49,7 +49,7 @@ if min(min(all_soln_conditions)) >= 0
         for i = 1:k
             xdiff = exp_set(i,:) - x0; % x_i - x0
             first_term = -sqrt(D_cutoff_grad*(1/n_vec(i)*[1,-xdiff]*sample_full_cov(:,:,i)*[1;-xdiff']));
-            second_term = sample_mean(i) - xdiff*sample_mean_grad(i)';
+            second_term = sample_mean(i) - xdiff*sample_mean_grad(i,:)';
             LHS_vec(i) = first_term + second_term;
         end
         left_max = max(LHS_vec);

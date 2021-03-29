@@ -1,18 +1,18 @@
 % newsvendor problem
 oracle_string = 'synthetic2_grad_oracle';
 oracle_n_rngs = 1;
-[X, Y] = meshgrid(-2:.05:2, -2:.05:2);
+[X, Y] = meshgrid(-1.95:.05:1.95, -1.95:.05:1.95);
 n_grid = size(X,1)*size(X,2);
 feas_region = [reshape(X,[n_grid, 1]), reshape(Y,[n_grid, 1])];
 exp_set = [0, 0;
-    -2/3, -2/3; 
-    2/3, 2/3; 
-    -2/3, 2/3; 
-    2/3, -2/3;
-    -4/3, 0;
-    4/3, 0;
-    0, -4/3;
-    0, 4/3];
+    -0.75, -0.75; 
+    0.75, 0.75; 
+    -0.75, 0.75; 
+    0.75, -0.75;
+    -1.5, 0;
+    1.5, 0;
+    0, -1.5;
+    0, 1.5];
 k = size(exp_set, 1);
 n_vec = 20*ones(k, 1); % col vector
 alpha = 0.05; % Confidence level = 1-alpha

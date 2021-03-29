@@ -11,7 +11,7 @@ k = size(exp_set, 1);
 card_feas_region = size(feas_region, 1);
 SGX_indicators = zeros(card_feas_region, 1);
 
-[~, exp_set_indices] = ismember(exp_set, feas_region, 'rows'); 
+[~, exp_set_indices] = ismembertol(exp_set, feas_region, 'ByRows', true); 
 true_mean_exp_set = true_mean(exp_set_indices,:);
 true_grad_exp_set = true_grad(exp_set_indices,:); 
 
@@ -24,7 +24,7 @@ for l = 1:card_feas_region
     x0 = feas_region(l,:);
     
     % WORKS FOR 1-DIM. STILL NEED TO FIX
-    leftmax = max(true_mean_exp_set - (exp_set - repmat(x0, k, 1)).*true_grad_exp_set);
+    leftmax = max(true_mean_exp_set - sum((exp_set - repmat(x0, k, 1)).*true_grad_exp_set,2));
     rightmin = min(true_mean_exp_set);
     
     SGX_indicators(l) = (leftmax < rightmin);

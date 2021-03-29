@@ -6,11 +6,10 @@ PO_info_handle = str2func(strcat('setup_',fn_props));
 card_feas_region = size(feas_region, 1);
 SX_indicators = zeros(card_feas_region, 1);
 
-[~, exp_set_indices] = ismember(exp_set, feas_region, 'rows'); 
+[~, exp_set_indices] = ismembertol(exp_set, feas_region, 'ByRows', true); 
 true_mean_exp_set = true_mean(exp_set_indices,:);
 
 for l = 1:card_feas_region
-    
     x0 = feas_region(l,:);
     
     [A, C, b] = PO_info_handle(x0, exp_set, prop_params);
