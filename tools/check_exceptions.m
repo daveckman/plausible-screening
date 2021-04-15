@@ -12,7 +12,7 @@ if ~any(strcmp(discrep_string, accept_discreps))
 end
 
 % Check functional property string
-accept_fn_props = {'lipschitz', 'lipschitz_proj', 'convex'};
+accept_fn_props = {'lipschitz', 'lipschitz_proj', 'convex', 'convex_nearopt'};
 if ~any(strcmp(fn_props, accept_fn_props))
     fprintf('\nERROR: "%s" is not a valid functional property.\n', fn_props)
     fprintf('Please specify a valid functional property:')

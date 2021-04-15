@@ -13,6 +13,8 @@ check_exceptions(discrep_string, fn_props, n_vec)
 card_feas_region = size(feas_region, 1);
 d = size(feas_region, 2);
 
+opttol = 0.1; % delta
+
 %%
 % CALCULATE TRUE OBJECTIVE FUNCTIONS AND TRUE GRADIENTS
 
@@ -55,7 +57,7 @@ hold off
 
 %%
 % Plot the ellipsoid of acceptable solutions
-% delta=0.1 optimal
+% delta=0.1 optimal = opttol
 
 % (x1, y1) and (x2, y2) are coordinates of vertices on major axis
 % e is eccentricity
@@ -81,9 +83,9 @@ hold off
 
 %%
 % COMPUTE SO(X), SG(X), and SOG(X) and plot them
-SOX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'convex', '');
-SGX_indicators = construct_det_grad_subset(feas_region, exp_set, true_mean, true_grad);
-SOGX_indicators = construct_det_grad_only_subset(feas_region, exp_set, true_mean, true_grad);
+SOX_indicators = construct_det_no_grad_subset(feas_region, exp_set, true_mean, 'convex_nearopt', '', opttol);
+SGX_indicators = construct_det_grad_subset(feas_region, exp_set, true_mean, true_grad, opttol);
+SOGX_indicators = construct_det_grad_only_subset(feas_region, exp_set, true_mean, true_grad, opttol);
 
 % ...continuing from previous block of code
 hold on
@@ -209,42 +211,35 @@ box on
 hold off
 
 %%
+
+%%%% MAIN SECTION NOW (after first two subsections)
+
 % if running multiple macroreplications...
 
 % Number of macroreplications
-%M = 1; % Small run to directly show subset
-M = 100; % Larger run to show inclusion probabilities
+M = 1; % Small run to directly show subset
+%M = 100; % Larger run to show inclusion probabilities
 
-% Calculate cutoffs for PS
-D_cutoff_d2 = calc_cutoff(k, n_vec, alpha, 'ell2'); % PS: only performances
-D_cutoff_inf = calc_cutoff(k, n_vec, alpha, 'ellinf'); % PS: only performances
-D_cutoff_grad = calc_grad_cutoff(k, d, n_vec, alpha); % GPS
-D_cutoff_gradinf = calc_gradinf_cutoff(k, d, n_vec, alpha); % GPS
-D_cutoff_gradinfeff = calc_gradinf_cutoff(k, d-1, n_vec, alpha); % only gradients
+% Calculate cutoffs for different methods
+D_cutoff_PS = calc_cutoff(k, n_vec, alpha, 'ellinf'); % RPS: only performances
+D_cutoff_PSG = calc_gradinf_cutoff(k, d, n_vec, alpha); % PSG
+%D_cutoff_PSOG = calc_gradinf_cutoff(k, d-1, n_vec, alpha); % PSOG
+D_cutoff_PSOG = calc_gradinftight_cutoff(k, d, n_vec, alpha); 
 
 % Initialize data storage
 
-% Plausible Screening
-S_indicators_d2 = zeros(card_feas_region, M);
+% (Relaxed) Plausible Screening with dinf
+S_PS_indicators = zeros(card_feas_region, M);
 D_x0s = zeros(card_feas_region, M);
-S_poly_indicators_d2 = zeros(card_feas_region, M);
+S_RPS_indicators = zeros(card_feas_region, M);
 
-% Gradient Plausible Screening with d2 grad and RGPS
-S_indicators_grad = zeros(card_feas_region, M);
-D_x0s_grad = zeros(card_feas_region, M);
-S_poly_indicators_grad = zeros(card_feas_region, M);
+% Plausible Screening with Gradients
+%S_indicators_gradinf = zeros(card_feas_region, M);
+%D_x0s_gradinf = zeros(card_feas_region, M);
+S_PSG_indicators = zeros(card_feas_region, M);
 
-% Gradient Plausible Screening with dinf grad and RGPS
-S_indicators_gradinf = zeros(card_feas_region, M);
-D_x0s_gradinf = zeros(card_feas_region, M);
-S_poly_indicators_gradinf = zeros(card_feas_region, M);
-
-% Relaxed relaxed PS, using performances too
-Sonlygrad_d2_indicators = zeros(card_feas_region, M);
-Sonlygrad_dinf_indicators = zeros(card_feas_region, M);
-
-% Only gradients with dinf
-Sonlygrad_dinf_eff_indicators = zeros(card_feas_region, M);
+% Plausible Screening with Only Gradients
+S_PSOG_indicators = zeros(card_feas_region, M);
 
 print_problem_header(problem_string, feas_region, exp_set, fn_props)
 
@@ -257,36 +252,28 @@ parfor m = 1:M
     % Generate data and calculate summary statistics
     fprintf('Generating sample data for plausible optima...\n')
     [sample_mean, sample_var, sample_mean_grad, sample_full_cov] = generate_grad_data(m, 'synthetic2_grad_oracle', oracle_n_rngs, exp_set, n_vec, 'grad');
-% 
-%     % Original Plausible Screening
-%     discrep_string = 'ell2';
-%     fprintf('Screening solutions for %s discrepancy...\n', discrep_string)
-%     [S_indicators_d2(:,m), D_x0s(:,m), S_poly_indicators_d2(:,m), ~] = PO_screen(feas_region, exp_set, sample_mean, sample_var, n_vec, 'ell2', D_cutoff_d2, fn_props, prop_params, LP_solver_string);
-%     fprintf('\nResults of PS screening\n---------------------------------------------feas----------\n')
-%     fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
-%     fprintf('\t# of solutions in PS d2 subset: \t\t\t%d\n', sum(S_indicators_d2(:,m)))  
-%     %fprintf('\t# of solutions in PS relaxed subset: \t%d\n\n', sum(S_poly_indicators_d2(:,m)))
-% 
-    % Gradient Plausible Screening w/ Dgrad
-    [S_poly_indicators_grad(:,m)] = GPS_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_grad);
-    fprintf('\nResults of GPS screening\n-------------------------------------------------------\n')
-    fprintf('\tstandardized discrepancy: \t\t\t\t Gradients\n')
-    %fprintf('\t# of solutions in GPS d2 subset: \t\t\t%d\n', sum(S_indicators_grad(:,m)))  
-    fprintf('\t# of solutions in GPS relaxed subset: \t%d\n\n', sum(S_poly_indicators_grad(:,m)))
+
+    % Original Plausible Screening
+    discrep_string = 'ellinf';
+    fprintf('Screening solutions for %s discrepancy...\n', discrep_string)
+    [S_PS_indicators(:,m), D_x0s(:,m), S_RPS_indicators(:,m), ~] = PS_screen_fast(feas_region, exp_set, sample_mean, sample_var, n_vec, 'ellinf', D_cutoff_PS, fn_props, prop_params, LP_solver_string, opttol);
+    fprintf('\nResults of PS screening\n-------------------------------------------------------\n')
+    %fprintf('\tstandardized discrepancy: \t\t\t\t%s\n', discrep_string)
+    fprintf('\t# of solutions in PS subset: \t\t\t%d\n', sum(S_PS_indicators(:,m)))  
+    fprintf('\t# of solutions in RPS subset: \t%d\n\n', sum(S_RPS_indicators(:,m)))
+
 
 %     % Gradient Plausible Screening w/ Dgradinf
-%     [S_poly_indicators_gradinf(:,m)] = GPSinf_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_gradinf);
-%     fprintf('\nResults of GPS screening (dinf) \n-------------------------------------------------------\n')
-%     fprintf('\tstandardized discrepancy: \t\t\t\t Gradients\n')
-%     %fprintf('\t# of solutions in GPS inf subset: \t\t\t%d\n', sum(S_indicators_gradinf(:,m)))  
-%     fprintf('\t# of solutions in GPS inf relaxed subset: \t%d\n\n', sum(S_poly_indicators_gradinf(:,m)))
-%      
+%     S_PSG_indicators(:,m) = PSG_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_PSG, opttol);
+%     fprintf('\nResults of PSG screening (dinf) \n-------------------------------------------------------\n')
+%     %fprintf('\tstandardized discrepancy: \t\t\t\t Gradients\n')
+%     fprintf('\t# of solutions in PSG subset: \t%d\n\n', sum(S_PSG_indicators(:,m)))
+      
 %     % Relaxed Gradient Plausible Screening w/ only gradients
-%     [Sonlygrad_d2_indicators(:,m), Sonlygrad_dinf_indicators(:,m), Sonlygrad_dinf_eff_indicators(:,m)] = RGPS_onlygrad_screen(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_grad, D_cutoff_gradinf, D_cutoff_gradinfeff);
-%     fprintf('\nResults of RGPS screening (only gradients) \n-------------------------------------------------------\n')
-%     %fprintf('\t# of solutions in RGPS (only gradients) d2 subset: \t\t\t%d\n', sum(Sonlygrad_d2_indicators(:,m)))  
-%     %fprintf('\t# of solutions in RGPS (only gradients) dinf subset: \t\t%d\n', sum(Sonlygrad_dinf_indicators(:,m)))
-%     fprintf('\t# of solutions in RGPS (only gradients) dinfeff subset: \t%d\n\n', sum(Sonlygrad_dinf_eff_indicators(:,m)))
+%     S_PSOG_indicators(:,m) = PSOG_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_PSOG, opttol);
+%     fprintf('\nResults of PSOG screening \n-------------------------------------------------------\n')
+%     %fprintf('\tstandardized discrepancy: \t\t\t\t Gradients\n')
+%     fprintf('\t# of solutions in PSOG subset: \t%d\n\n', sum(S_PSOG_indicators(:,m)))
 
 end
 
@@ -298,13 +285,12 @@ hold on
 
 colormap summer
 rescale_coef = max(max(true_mean_mat)) - min(min(true_mean_mat));
-scatter(feas_region(:,1), feas_region(:,2), 20, mean(Sonlygrad_dinf_eff_indicators,2)*rescale_coef, 's', 'filled')
-%scatter(feas_region(:,1), feas_region(:,2), 20, mean(Sonlygrad_dinf_eff_indicators,2), 's', 'filled')
+scatter(feas_region(:,1), feas_region(:,2), 20, mean(S_RPS_indicators,2)*rescale_coef, 's', 'filled')
 contour(x_mat, y_mat, true_mean_mat, 10, 'LineColor', 'k')
 scatter(exp_set(:,1), exp_set(:,2), 50, 'kx', 'LineWidth', 2) % plot experimental set X
 scatter(1, 1, 50, 'k*', 'LineWidth', 1) % plot optimal solution
 
-title('Inclusion Probabilities for RRGPS');
+%title('Inclusion Probabilities for PS');
 xlim([-2,2])
 xlabel('$x_1$', 'Interpreter', 'latex')
 ylim([-2,2])
@@ -321,13 +307,12 @@ hold on
 
 colormap summer
 rescale_coef = max(max(true_mean_mat)) - min(min(true_mean_mat));
-scatter(feas_region(:,1), feas_region(:,2), 20, mean(S_poly_indicators_gradinf,2)*rescale_coef, 's', 'filled')
-%scatter(feas_region(:,1), feas_region(:,2), 20, mean(Sonlygrad_dinf_eff_indicators,2), 's', 'filled')
+scatter(feas_region(:,1), feas_region(:,2), 20, mean(S_PSG_indicators,2)*rescale_coef, 's', 'filled')
 contour(x_mat, y_mat, true_mean_mat, 10, 'LineColor', 'k')
 scatter(exp_set(:,1), exp_set(:,2), 50, 'kx', 'LineWidth', 2) % plot experimental set X
 scatter(1, 1, 50, 'k*', 'LineWidth', 1) % plot optimal solution
 
-title('Inclusion Probabilities for RGPS dinf');
+%title('Inclusion Probabilities for PSG');
 xlim([-2,2])
 xlabel('$x_1$', 'Interpreter', 'latex')
 ylim([-2,2])
@@ -345,13 +330,12 @@ hold on
 
 colormap summer
 rescale_coef = max(max(true_mean_mat)) - min(min(true_mean_mat));
-scatter(feas_region(:,1), feas_region(:,2), 20, mean(S_poly_indicators_grad,2)*rescale_coef, 's', 'filled')
-%scatter(feas_region(:,1), feas_region(:,2), 20, mean(Sonlygrad_dinf_eff_indicators,2), 's', 'filled')
+scatter(feas_region(:,1), feas_region(:,2), 20, mean(S_PSOG_indicators,2)*rescale_coef, 's', 'filled')
 contour(x_mat, y_mat, true_mean_mat, 10, 'LineColor', 'k')
 scatter(exp_set(:,1), exp_set(:,2), 50, 'kx', 'LineWidth', 2) % plot experimental set X
 scatter(1, 1, 50, 'k*', 'LineWidth', 1) % plot optimal solution
 
-title('Inclusion Probabilities for RGPS d2');
+%title('Inclusion Probabilities for PSOG');
 xlim([-2,2])
 xlabel('$x_1$', 'Interpreter', 'latex')
 ylim([-2,2])
@@ -363,35 +347,35 @@ hold off
 
 %% THE REST IS NOT USED
 
-%% 
-% CHECK RGPS WITH PLUGGING IN TRUE GRADIENTS
-%M = 100;
-
-exact_grads = true_grad(exp_set,:);
-
-D_grad = calc_grad_cutoff(k, d, n_vec, alpha);
-D_d2 = calc_cutoff(k, n_vec, alpha, 'ell2');
-
-S_test_indicators_grad = zeros(card_feas_region, M);
-
-parfor m = 1:M
-    
-    fprintf('Running macrorep %d of %d.\n', m, M)
-    
-    % SAMPLING
-    
-    % Generate data and calculate summary statistics
-    fprintf('Generating sample data for plausible optima...\n')
-    [sample_mean, sample_var, sample_mean_grad, sample_full_cov] = generate_grad_data(m, 'cts_newsvendor_grad_oracle', oracle_n_rngs, exp_set, n_vec, 'grad');
-
-    
-    
-    %[sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
-    S_testg_indicators_grad(:,m) = RGPSexact_screen(feas_region, exp_set, sample_mean, sample_var, exact_grads, n_vec, D_grad);
-    S_test2_indicators_grad(:,m) = RGPSexact_screen(feas_region, exp_set, sample_mean, sample_var, exact_grads, n_vec, D_d2);
-    fprintf('\nResults of RGPS screening (using exact gradients)\n-------------------------------------------------------\n')
-    fprintf('\tstandardized discrepancy: \t\t\t\t Gradients\n')
-    fprintf('\t# of solutions in GPS relaxed subset: \t%d\n\n', sum(S_testg_indicators_grad(:,m)))
-    fprintf('\t# of solutions in GPS relaxed subset (d2 cutoff): \t%d\n\n', sum(S_test2_indicators_grad(:,m)))
-
-end
+% %% 
+% % CHECK RGPS WITH PLUGGING IN TRUE GRADIENTS
+% %M = 100;
+% 
+% exact_grads = true_grad(exp_set,:);
+% 
+% D_grad = calc_grad_cutoff(k, d, n_vec, alpha);
+% D_d2 = calc_cutoff(k, n_vec, alpha, 'ell2');
+% 
+% S_test_indicators_grad = zeros(card_feas_region, M);
+% 
+% parfor m = 1:M
+%     
+%     fprintf('Running macrorep %d of %d.\n', m, M)
+%     
+%     % SAMPLING
+%     
+%     % Generate data and calculate summary statistics
+%     fprintf('Generating sample data for plausible optima...\n')
+%     [sample_mean, sample_var, sample_mean_grad, sample_full_cov] = generate_grad_data(m, 'cts_newsvendor_grad_oracle', oracle_n_rngs, exp_set, n_vec, 'grad');
+% 
+%     
+%     
+%     %[sample_mean, sample_var] = generate_data(m, oracle_string, oracle_n_rngs, exp_set, n_vec, 'ell1');
+%     S_testg_indicators_grad(:,m) = RGPSexact_screen(feas_region, exp_set, sample_mean, sample_var, exact_grads, n_vec, D_grad);
+%     S_test2_indicators_grad(:,m) = RGPSexact_screen(feas_region, exp_set, sample_mean, sample_var, exact_grads, n_vec, D_d2);
+%     fprintf('\nResults of RGPS screening (using exact gradients)\n-------------------------------------------------------\n')
+%     fprintf('\tstandardized discrepancy: \t\t\t\t Gradients\n')
+%     fprintf('\t# of solutions in GPS relaxed subset: \t%d\n\n', sum(S_testg_indicators_grad(:,m)))
+%     fprintf('\t# of solutions in GPS relaxed subset (d2 cutoff): \t%d\n\n', sum(S_test2_indicators_grad(:,m)))
+% 
+% end

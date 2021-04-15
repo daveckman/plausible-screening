@@ -1,4 +1,4 @@
-function SGX_indicators = construct_det_grad_subset(feas_region, exp_set, true_mean, true_grad) %, fn_props, prop_params)
+function SGX_indicators = construct_det_grad_subset(feas_region, exp_set, true_mean, true_grad, opttol) %, fn_props, prop_params)
 % Construct the deterministic subset SG(X) for known objective function
 % and gradient values.
 
@@ -23,9 +23,8 @@ for l = 1:card_feas_region
     
     x0 = feas_region(l,:);
     
-    % WORKS FOR 1-DIM. STILL NEED TO FIX
     leftmax = max(true_mean_exp_set - sum((exp_set - repmat(x0, k, 1)).*true_grad_exp_set,2));
-    rightmin = min(true_mean_exp_set);
+    rightmin = min(true_mean_exp_set) + opttol;
     
     SGX_indicators(l) = (leftmax < rightmin);
     

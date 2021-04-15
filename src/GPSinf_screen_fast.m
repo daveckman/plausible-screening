@@ -1,4 +1,4 @@
-function [S_poly_indicators] = GPSinf_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_gradinf)
+function [S_poly_indicators] = GPSinf_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_gradinf, opttol)
 
 % Gradient Plausible Screening with Dinfinity discrepancy
 % Carry out (+ relaxed) plausible screening w.r.t. optimality and convexity.
