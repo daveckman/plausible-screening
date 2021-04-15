@@ -43,53 +43,56 @@ scatter(exp_set(:,1), exp_set(:,2), 50, 'kx', 'LineWidth', 2) % plot experimenta
 scatter(1, 1, 50, 'k*', 'LineWidth', 1) % plot optimal solution
 quiver(exp_set(:,1), exp_set(:,2), true_grad_exp_set(:,1), true_grad_exp_set(:,2), 'b-', 'LineWidth', 1) % plot sample gradients
 
-title('True Performance Function and Gradients');
+%title('True Performance Function and Gradients');
 xlim([-2,2])
-xlabel('$x_1$', 'Interpreter', 'latex')
+xlabel('$x^{(1)}$', 'Interpreter', 'latex')
 ylim([-2,2])
-ylabel('$x_2$', 'Interpreter', 'latex')
+ylabel('$x^{(2)}$', 'Interpreter', 'latex')
 axis square
 box on
 hold off
 
 
 %%
-% COMPUTE S(X) and plot it
-SX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'convex', '');
+% Plot the ellipsoid of acceptable solutions
+% delta=0.1 optimal
+
+% (x1, y1) and (x2, y2) are coordinates of vertices on major axis
+% e is eccentricity
+% numbers from online ellipse calculator...
+x1 = 1 - sqrt(10)/10;
+x2 = 1 + sqrt(10)/10;
+y1 = 1 - sqrt(10)/10;
+y2 = 1 + sqrt(10)/10;
+e = sqrt(6)/3;
+
+a = 1/2*sqrt((x2-x1)^2+(y2-y1)^2);
+b = a*sqrt(1-e^2);
+t = linspace(0,2*pi);
+X = a*cos(t);
+Y = b*sin(t);
+w = atan2(y2-y1,x2-x1);
+xv = (x1+x2)/2 + X*cos(w) - Y*sin(w);
+yv = (y1+y2)/2 + X*sin(w) + Y*cos(w);
+
+hold on
+h0 = plot(xv,yv,'b-', 'LineWidth', 2);
+hold off
+
+%%
+% COMPUTE SO(X), SG(X), and SOG(X) and plot them
+SOX_indicators = construct_det_subset(feas_region, exp_set, true_mean, 'convex', '');
+SGX_indicators = construct_det_grad_subset(feas_region, exp_set, true_mean, true_grad);
+SOGX_indicators = construct_det_grad_only_subset(feas_region, exp_set, true_mean, true_grad);
 
 % ...continuing from previous block of code
 hold on
-[~,h1] = contour(x_mat, y_mat, reshape(SX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'r', 'LineWidth', 2);
-title('S(X) for PS with only performances')
-hold off
-
-%%
-% COMPUTE SG(X) and plot it
-
-SGX_indicators = construct_det_grad_subset(feas_region, exp_set, true_mean, true_grad);
-
-% ...continuing from previous previous block of code
-hold on
+[~,h1] = contour(x_mat, y_mat, reshape(SOX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'r', 'LineWidth', 2);
 [~,h2] = contour(x_mat, y_mat, reshape(SGX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'm', 'LineWidth', 2);
-title('SG(X) for GPS')
+[~,h3] = contour(x_mat, y_mat, reshape(SOGX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'c', 'LineWidth', 2);
 hold off
 
-%%
-% COMPUTE SRGO(X) and plot it
-% GO stands for gradients only
-
-SRGOX_indicators = construct_det_grad_only_subset(feas_region, exp_set, true_mean, true_grad);
-
-% ...continuing from previous previous block of code
-hold on
-[~,h3] = contour(x_mat, y_mat, reshape(SRGOX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'c', 'LineWidth', 2);
-title('SRGO(X) for GPS')
-hold off
-
-%%
-% Add legends
-legend([h1, h2, h3], 'S(X)', 'SG(X)', 'SRGO(X)', 'Location', 'southwest')
-title('Deterministic Subsets')
+legend([h0, h1, h2, h3], '$\mathcal{A}$', '$\mathrm{S}^{\mathrm{O}}(\mathrm{X})$', '$\mathrm{S}^{\mathrm{G}}(\mathrm{X})$', '$\mathrm{S}^{\mathrm{OG}}(\mathrm{X})$', 'Location', 'northwest', 'Interpreter', 'latex')
 
 %% RUN MACROREPLICATIONS
 

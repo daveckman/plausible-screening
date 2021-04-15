@@ -20,8 +20,8 @@ y = solution(2);
 mu_noise = 0.5 + sqrt((x-1)^2 + (y-1)^2);
 grad_noise = 0.5 + sqrt((x-1)^2 + (y-1)^2);
 rho_mu_x = 0.5;
-rho_mu_y = 0.3;
-rho_x_y = -0.2;
+rho_mu_y = 0.5;
+rho_x_y = 0.5;
 
 % (Y, G) will be generated according to MVN(MU, SIGMA)
 MU = [x^2 - x - x*y - y + y^2 + 1, 2*x - y - 1, 2*y - x - 1];
