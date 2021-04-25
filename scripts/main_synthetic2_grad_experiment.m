@@ -43,7 +43,7 @@ hold on
 contour(x_mat, y_mat, true_mean_mat, 10, 'LineColor', 'k')
 scatter(exp_set(:,1), exp_set(:,2), 50, 'kx', 'LineWidth', 2) % plot experimental set X
 scatter(1, 1, 50, 'k*', 'LineWidth', 1) % plot optimal solution
-quiver(exp_set(:,1), exp_set(:,2), true_grad_exp_set(:,1), true_grad_exp_set(:,2), 'k--', 'LineWidth', 1.5) % plot true gradients
+quiver(exp_set(:,1), exp_set(:,2), true_grad_exp_set(:,1), true_grad_exp_set(:,2), 'k:', 'LineWidth', 1.5) % plot true gradients
 
 %title('True Performance Function and Gradients');
 xlim([-2,2])
@@ -80,7 +80,7 @@ xv = (x1+x2)/2 + X*cos(w) - Y*sin(w);
 yv = (y1+y2)/2 + X*sin(w) + Y*cos(w);
 
 hold on
-h0 = plot(xv,yv,'b-', 'LineWidth', 2);
+h0 = plot(xv,yv,'k--', 'LineWidth', 2);
 hold off
 
 legend([h0], '$\mathcal{A}$', 'Location', 'northwest', 'Interpreter', 'latex')
@@ -139,17 +139,38 @@ parfor m = 1:M
 % %    fprintf('\t# of solutions in PS subset: \t\t\t%d\n', sum(S_PS_indicators(:,m)))  
 %     fprintf('\t# of solutions in RPS subset: \t%d\n\n', sum(S_RPS_indicators(:,m)))
 
-%     % Gradient Plausible Screening w/ Dgradinf
-%     S_PSG_indicators(:,m) = PSG_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_PSG, opttol);
-%     fprintf('\nResults of PSG screening (dinf) \n-------------------------------------------------------\n')
-%     fprintf('\t# of solutions in PSG subset: \t%d\n\n', sum(S_PSG_indicators(:,m)))
+    % Gradient Plausible Screening w/ Dgradinf
+    S_PSG_indicators(:,m) = PSG_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_PSG, opttol);
+    fprintf('\nResults of PSG screening (dinf) \n-------------------------------------------------------\n')
+    fprintf('\t# of solutions in PSG subset: \t%d\n\n', sum(S_PSG_indicators(:,m)))
       
-    % Relaxed Gradient Plausible Screening w/ only gradients
-    S_PSOG_indicators(:,m) = PSOG_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_PSOG, opttol);
-    fprintf('\nResults of PSOG screening \n-------------------------------------------------------\n')
-    fprintf('\t# of solutions in PSOG subset: \t%d\n\n', sum(S_PSOG_indicators(:,m)))
+%     % Relaxed Gradient Plausible Screening w/ only gradients
+%     S_PSOG_indicators(:,m) = PSOG_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_PSOG, opttol);
+%     fprintf('\nResults of PSOG screening \n-------------------------------------------------------\n')
+%     fprintf('\t# of solutions in PSOG subset: \t%d\n\n', sum(S_PSOG_indicators(:,m)))
 
 end
+
+%% Setup for PS/PSG/PSOG limiting sets
+
+[X_fine, Y_fine] = meshgrid(-1.975:.025:1.975, -1.975:.025:1.975);
+n_grid = size(X_fine,1)*size(X_fine,2);
+feas_region_fine = [reshape(X_fine,[n_grid, 1]), reshape(Y_fine,[n_grid, 1])];
+card_feas_region_fine = size(feas_region_fine, 1);
+
+x_vec_fine = feas_region_fine(:,1);
+y_vec_fine = feas_region_fine(:,2);
+true_mean_fine = x_vec_fine.^2 - x_vec_fine - x_vec_fine.*y_vec_fine - y_vec_fine + y_vec_fine.^2 + 1;
+true_grad_fine = [2*x_vec_fine - y_vec_fine - 1, 2*y_vec_fine - x_vec_fine - 1];
+
+x_mat_fine = reshape(x_vec_fine, [sqrt(card_feas_region_fine), sqrt(card_feas_region_fine)]);
+y_mat_fine = reshape(y_vec_fine, [sqrt(card_feas_region_fine), sqrt(card_feas_region_fine)]);
+
+%% Expensive setup for PS
+
+%SOX_indicators = construct_det_no_grad_subset(feas_region, exp_set, true_mean, 'convex_nearopt', '', opttol);
+SOX_indicators = construct_det_no_grad_subset(feas_region_fine, exp_set, true_mean_fine, 'convex_nearopt', '', opttol);
+
 
 %% Plot test case for PS
 
@@ -163,10 +184,11 @@ scatter(feas_region(:,1), feas_region(:,2), 20, mean(S_RPS_indicators,2)*rescale
 contour(x_mat, y_mat, true_mean_mat, 10, 'LineColor', 'k')
 scatter(exp_set(:,1), exp_set(:,2), 50, 'kx', 'LineWidth', 2) % plot experimental set X
 
-h0 = plot(xv,yv,'k:', 'LineWidth', 2);
-SOX_indicators = construct_det_no_grad_subset(feas_region, exp_set, true_mean, 'convex_nearopt', '', opttol);
-[~,h1] = contour(x_mat, y_mat, reshape(SOX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'k', 'LineWidth', 2);
-legend([h1], '$\mathrm{S}^{\mathrm{O}}(\mathrm{X})$', 'Location', 'northwest', 'Interpreter', 'latex')
+h0 = plot(xv,yv,'k--', 'LineWidth', 2);
+%SOX_indicators = construct_det_no_grad_subset(feas_region, exp_set, true_mean, 'convex_nearopt', '', opttol);
+%[~,h1] = contour(x_mat, y_mat, reshape(SOX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'k', 'LineWidth', 2);
+[~,h1] = contour(x_mat_fine, y_mat_fine, reshape(SOX_indicators,[sqrt(card_feas_region_fine), sqrt(card_feas_region_fine)]), 1, 'LineColor', 'k', 'LineWidth', 2);
+legend([h1], '$\mathsf{S}^{\mathsf{O}}(\mathsf{X})$', 'Location', 'northwest', 'Interpreter', 'latex')
 
 xlim([-2,2])
 xlabel('$x^{(1)}$', 'Interpreter', 'latex')
@@ -192,10 +214,13 @@ scatter(feas_region(:,1), feas_region(:,2), 20, mean(S_PSG_indicators,2)*rescale
 contour(x_mat, y_mat, true_mean_mat, 10, 'LineColor', 'k')
 scatter(exp_set(:,1), exp_set(:,2), 50, 'kx', 'LineWidth', 2) % plot experimental set X
 
-h0 = plot(xv, yv, 'k:', 'LineWidth', 2); % or patch
-SGX_indicators = construct_det_grad_subset(feas_region, exp_set, true_mean, true_grad, opttol);
-[~,h2] = contour(x_mat, y_mat, reshape(SGX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'k', 'LineWidth', 2);
-legend([h2], '$\mathrm{S}^{\mathrm{G}}(\mathrm{X})$', 'Location', 'northwest', 'Interpreter', 'latex')
+h0 = plot(xv, yv, 'k--', 'LineWidth', 2); % or patch
+%SGX_indicators = construct_det_grad_subset(feas_region, exp_set, true_mean, true_grad, opttol);
+%[~,h2] = contour(x_mat, y_mat, reshape(SGX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'k', 'LineWidth', 2);
+SGX_indicators = construct_det_grad_subset(feas_region_fine, exp_set, true_mean_fine, true_grad_fine, opttol);
+[~,h2] = contour(x_mat_fine, y_mat_fine, reshape(SGX_indicators,[sqrt(card_feas_region_fine), sqrt(card_feas_region_fine)]), 1, 'LineColor', 'k', 'LineWidth', 2);
+
+legend([h2], '$\mathsf{S}^{\mathsf{G}}(\mathsf{X})$', 'Location', 'northwest', 'Interpreter', 'latex')
 
 
 xlim([-2,2])
@@ -222,10 +247,12 @@ scatter(feas_region(:,1), feas_region(:,2), 20, mean(S_PSOG_indicators,2)*rescal
 contour(x_mat, y_mat, true_mean_mat, 10, 'LineColor', 'k')
 scatter(exp_set(:,1), exp_set(:,2), 50, 'kx', 'LineWidth', 2) % plot experimental set X
 
-h0 = plot(xv,yv,'k:', 'LineWidth', 2);
-SOGX_indicators = construct_det_grad_only_subset(feas_region, exp_set, true_mean, true_grad, opttol);
-[~,h3] = contour(x_mat, y_mat, reshape(SOGX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'k', 'LineWidth', 2);
-legend([h3], '$\mathrm{S}^{\mathrm{OG}}(\mathrm{X})$', 'Location', 'northwest', 'Interpreter', 'latex')
+h0 = plot(xv,yv,'k--', 'LineWidth', 2);
+%SOGX_indicators = construct_det_grad_only_subset(feas_region, exp_set, true_mean, true_grad, opttol);
+%[~,h3] = contour(x_mat, y_mat, reshape(SOGX_indicators,[sqrt(card_feas_region), sqrt(card_feas_region)]), 1, 'LineColor', 'k', 'LineWidth', 2);
+SOGX_indicators = construct_det_grad_only_subset(feas_region_fine, exp_set, true_mean_fine, true_grad_fine, opttol);
+[~,h3] = contour(x_mat_fine, y_mat_fine, reshape(SOGX_indicators,[sqrt(card_feas_region_fine), sqrt(card_feas_region_fine)]), 1, 'LineColor', 'k', 'LineWidth', 2);
+legend([h3], '$\mathsf{S}^{\mathsf{OG}}(\mathsf{X})$', 'Location', 'northwest', 'Interpreter', 'latex')
 
 xlim([-2,2])
 xlabel('$x^{(1)}$', 'Interpreter', 'latex')
