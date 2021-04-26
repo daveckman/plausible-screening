@@ -31,9 +31,20 @@ for l = 1:card_feas_region
         RHS_vec(i) = sqrt(D_cutoff*1/n_vec(i)*sample_full_cov(1,1,i)) + sample_mean(i);
     end
     right_min = min(RHS_vec) + opttol;
-
+    
+    % Second constraint to handle i=j pairs
+    LHS_vec2 = zeros(k,1);
+    for i = 1:k
+        xdiff = exp_set(i,:) - x0; % x_i - x0
+        first_term = -sqrt(D_cutoff*(1/n_vec(i)*[0,-xdiff]*sample_full_cov(:,:,i)*[0;-xdiff']));
+        second_term = -xdiff*sample_mean_grad(i,:)';
+        LHS_vec2(i) = first_term + second_term;
+    end
+    left_max2 = max(LHS_vec2);
+    
     % Classify solution x0 via relaxation
-    S_poly_indicators(l) = (left_max <= right_min); 
+    %S_poly_indicators(l) = (left_max <= right_min); 
+    S_poly_indicators(l) = (left_max <= right_min && left_max2 <= opttol); 
 
 end % end for
 
