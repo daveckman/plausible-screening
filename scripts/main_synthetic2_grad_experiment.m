@@ -99,7 +99,8 @@ M = 100; % Larger run to show inclusion probabilities
 
 % Calculate cutoffs for different methods
 D_cutoff_PS = calc_cutoff(k, n_vec, alpha, 'ellinf'); % RPS: only performances
-D_cutoff_PSG = calc_gradinf_cutoff(k, d, n_vec, alpha); % PSG
+D_cutoff_PSG = calc_gradinf_cutoff(k, d, n_vec, alpha); % PSG w/ dinf
+D_cutoff_PSG_d2 = calc_grad_cutoff(k, d, n_vec, alpha); % PSG w/ d2
 %D_cutoff_PSOG = calc_gradinf_cutoff(k, d-1, n_vec, alpha); % PSOG
 D_cutoff_PSOG = calc_gradinftight_cutoff(k, d, n_vec, alpha); 
 
@@ -139,11 +140,16 @@ parfor m = 1:M
 % %    fprintf('\t# of solutions in PS subset: \t\t\t%d\n', sum(S_PS_indicators(:,m)))  
 %     fprintf('\t# of solutions in RPS subset: \t%d\n\n', sum(S_RPS_indicators(:,m)))
 
-    % Gradient Plausible Screening w/ Dgradinf
-    S_PSG_indicators(:,m) = PSG_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_PSG, opttol);
-    fprintf('\nResults of PSG screening (dinf) \n-------------------------------------------------------\n')
-    fprintf('\t# of solutions in PSG subset: \t%d\n\n', sum(S_PSG_indicators(:,m)))
+%     % Gradient Plausible Screening w/ dinf
+%     S_PSG_indicators(:,m) = PSG_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_PSG, opttol);
+%     fprintf('\nResults of PSG screening (dinf) \n-------------------------------------------------------\n')
+%     fprintf('\t# of solutions in PSG subset: \t%d\n\n', sum(S_PSG_indicators(:,m)))
       
+    % Gradient Plausible Screening w/ d2
+    S_PSG_indicators(:,m) = PSG_d2_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_PSG_d2, opttol);
+    fprintf('\nResults of PSG screening (d2) \n-------------------------------------------------------\n')
+    fprintf('\t# of solutions in PSG subset: \t%d\n\n', sum(S_PSG_indicators(:,m)))
+    
 %     % Relaxed Gradient Plausible Screening w/ only gradients
 %     S_PSOG_indicators(:,m) = PSOG_screen_fast(feas_region, exp_set, sample_mean, sample_mean_grad, sample_full_cov, n_vec, D_cutoff_PSOG, opttol);
 %     fprintf('\nResults of PSOG screening \n-------------------------------------------------------\n')
